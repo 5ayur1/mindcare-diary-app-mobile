@@ -1,4 +1,4 @@
-package com.example.mindcarediary
+package com.fiap.mindcarediary
 
 import org.junit.Test
 

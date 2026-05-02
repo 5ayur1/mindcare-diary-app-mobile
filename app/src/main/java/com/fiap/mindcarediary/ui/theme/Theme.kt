@@ -1,4 +1,4 @@
-package com.example.mindcarediary.ui.theme
+package com.fiap.mindcarediary.ui.theme
 
 import android.app.Activity
 import android.os.Build

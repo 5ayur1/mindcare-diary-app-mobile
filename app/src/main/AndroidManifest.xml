@@ -12,10 +12,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MindcareDiary">
         <activity
-            android:name=".Activities.IntroActivity.IntroActivity"
+            android:name=".paciente.InicioPacienteActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".profissional.InicioProfissionalctivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TipoUsuarioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BemVindoActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MindcareDiary">

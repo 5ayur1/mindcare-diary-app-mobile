@@ -2,19 +2,17 @@ import org.gradle.kotlin.dsl.implementation
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.example.mindcarediary"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    namespace = "com.fiap.mindcarediary"
+    testNamespace = "com.fiap.mindcarediary"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.mindcarediary"
+        applicationId = "com.fiap.mindcarediary"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -33,12 +31,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
     }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+    // Or shorter:
+    jvmToolchain(17)
+    // For example:
+    jvmToolchain(17)
 }
 
 dependencies {

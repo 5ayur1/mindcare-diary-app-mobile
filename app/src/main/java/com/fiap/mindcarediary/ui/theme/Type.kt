@@ -1,4 +1,4 @@
-package com.example.mindcarediary.ui.theme
+package com.fiap.mindcarediary.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
