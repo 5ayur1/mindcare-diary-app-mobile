@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,6 +46,7 @@ fun BemVindoTela() {
     val backgroundColor = Color(0xFFD7ECFA)
     val textColor = Color(0xFF0A0A4A)
     val blue = Color(0xFF1E88E5)
+    val pink = Color(0xFFE63B96)
 
     val context = LocalContext.current
 
@@ -87,6 +87,27 @@ fun BemVindoTela() {
         ) {
             Text(
                 text = "Entrar",
+                color = Color.White,
+                fontSize = 18.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = {
+                val intent = Intent(context, CreditosActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier
+                .width(210.dp)
+                .height(52.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = pink
+            )
+        ) {
+            Text(
+                text = "Créditos",
                 color = Color.White,
                 fontSize = 18.sp
             )
