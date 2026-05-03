@@ -1,5 +1,6 @@
 package com.fiap.mindcarediary.paciente
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,22 +24,29 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fiap.mindcarediary.LoginActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fiap.mindcarediary.viewmodel.PacienteViewModel
 
 class InicioPacienteActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+        val email = intent.getStringExtra("email") ?: ""
         enableEdgeToEdge()
         setContent {
-            InicioPacienteTela(this)
+            InicioPacienteTela(email)
         }
     }
 }
@@ -48,26 +56,40 @@ data class DiaryItem(
     val date: String
 )
 
-@Composable
-fun InicioPacienteTela(
-    activity: InicioPacienteActivity = InicioPacienteActivity(),
-) {
+fun converteParaEmoji(nivelHumor: String): String {
+    when (nivelHumor) {
+        "OTIMO" -> return "😄"
+        "BOM" -> return "🙂"
+        "NEUTRO" -> return "😐"
+        "MAL" -> return "☹️"
+        "PESSIMO" -> return "😭"
+    }
+    return "-"
+}
 
-    val email = activity.intent?.getStringExtra("email") ?: "Unknown"
+@Composable
+fun InicioPacienteTela(email: String) {
+
+    val context = LocalContext.current
+    var viewModel: PacienteViewModel = viewModel()
+
+    LaunchedEffect(email) {
+        viewModel.loadRegistrosDiarios(email)
+    }
+
+    val registrosDiarios by viewModel.registrosDiarios.collectAsState()
 
     val background = Color(0xFFDDF1FA)
     val pink = Color(0xFFE78BC3)
     val bottomBar = Color(0xFFC8D8F7)
     val dark = Color(0xFF11114A)
 
-    val items = listOf(
-        DiaryItem("🙂", "Quarta-feira, 8 de Abril"),
-        DiaryItem("😄", "Terça-feira, 7 de Abril"),
-        DiaryItem("😐", "Segunda-feira, 6 de Abril"),
-        DiaryItem("😭", "Sábado, 4 de Abril"),
-        DiaryItem("☹️", "Sexta-feira, 3 de Abril"),
-        DiaryItem("🙂", "Quarta-feira, 1 de Abril")
-    )
+    val items = registrosDiarios.map { registro ->
+        DiaryItem(
+            emoji = converteParaEmoji(registro.nivelHumor),
+            date = registro.dataHoraCriacao.split("T")[0]
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -188,7 +210,11 @@ fun InicioPacienteTela(
 
             NavigationBarItem(
                 selected = false,
-                onClick = { },
+                onClick = {
+                    val intent = Intent(context, DiarioPacienteActivity::class.java)
+                    intent.putExtra("email", email)
+                    context.startActivity(intent)
+                },
                 icon = {
                     Icon(
                         Icons.Default.Article,
