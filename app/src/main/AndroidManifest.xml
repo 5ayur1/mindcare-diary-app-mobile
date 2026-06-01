@@ -25,7 +25,13 @@
             android:name=".paciente.InicioPacienteActivity"
             android:exported="false" />
         <activity
-            android:name=".profissional.InicioProfissionalctivity"
+            android:name=".profissional.InicioProfissionalActivity"
+            android:exported="false" />
+        <activity
+            android:name=".profissional.DiarioProfissionalActivity"
+            android:exported="false" />
+        <activity
+            android:name=".profissional.RelatorioProfissionalActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

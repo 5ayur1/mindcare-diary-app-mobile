@@ -54,7 +54,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +68,7 @@ import com.fiap.mindcarediary.service.Consulta
 import com.fiap.mindcarediary.service.Profissional
 import com.fiap.mindcarediary.service.TipoProfissional
 import com.fiap.mindcarediary.viewmodel.AgendamentoViewModel
+import com.fiap.mindcarediary.viewmodel.PacienteViewModel
 import com.fiap.mindcarediary.viewmodel.ProfissionalViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -98,14 +98,16 @@ fun AgendamentoTela(
 
     val agendamentoViewModel: AgendamentoViewModel = viewModel()
     val profissionalViewModel: ProfissionalViewModel = viewModel()
+    val pacienteViewModel: PacienteViewModel = viewModel()
 
     val tipoProfissional by agendamentoViewModel.tipoProfissional.collectAsState()
     val profissionais by profissionalViewModel.profissionais.collectAsState()
     val dadosProfissional by profissionalViewModel.dadosProfissional.collectAsState()
     val horarios by agendamentoViewModel.horarios.collectAsState()
+    val paciente by pacienteViewModel.paciente.collectAsState()
 
-    var profissionalSelecionado by rememberSaveable { mutableStateOf<Profissional?>(null) }
-    var horarioSelecionado by rememberSaveable { mutableStateOf<String?>(null) }
+    var profissionalSelecionado by remember { mutableStateOf<Profissional?>(null) }
+    var horarioSelecionado by remember { mutableStateOf<String?>(null) }
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = Instant.now().toEpochMilli()
@@ -122,6 +124,14 @@ fun AgendamentoTela(
             profissionais.filter {
                 it.tipoProfissional == tipoProfissional
             }
+        }
+    }
+
+    LaunchedEffect(email) {
+        if (email != null) {
+            pacienteViewModel.loadDadosPaciente(
+                email
+            )
         }
     }
 
@@ -186,8 +196,6 @@ fun AgendamentoTela(
                         context.startActivity(intent)
                     }
                 )
-
-
             }
 
 
@@ -310,11 +318,16 @@ fun AgendamentoTela(
                         agendamentoViewModel.cadastrarAgendamento(
                             Consulta(
                                 profissionalFinal,
+                                paciente,
                                 false,
                                 false,
                                 dateTimeFinal
                             )
                         )
+
+                        val intent = Intent(context, InicioPacienteActivity::class.java)
+                        intent.putExtra("email", email);
+                        context.startActivity(intent)
                     },
                     enabled = profissionalSelecionado != null && horarioSelecionado != null,
                     colors = ButtonDefaults.buttonColors(

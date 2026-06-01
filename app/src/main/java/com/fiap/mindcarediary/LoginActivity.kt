@@ -42,7 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fiap.mindcarediary.paciente.InicioPacienteActivity
-import com.fiap.mindcarediary.profissional.InicioProfissionalctivity
+import com.fiap.mindcarediary.profissional.InicioProfissionalActivity
 
 class LoginActivity : ComponentActivity() {
 
@@ -168,7 +168,7 @@ fun LoginTela(
                         intent.putExtra("senha", password)
                         context.startActivity(intent)
                 } else if("profissional".equals(tipoUsuario)) {
-                    val intent = Intent(context, InicioProfissionalctivity::class.java)
+                    val intent = Intent(context, InicioProfissionalActivity::class.java)
                     intent.putExtra("email", email)
                     intent.putExtra("senha", password)
                     context.startActivity(intent)

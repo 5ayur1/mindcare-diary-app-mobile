@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiap.mindcarediary.repository.PacienteRepository
+import com.fiap.mindcarediary.service.Paciente
 import com.fiap.mindcarediary.service.RegistroDiario
+import com.fiap.mindcarediary.service.RelatorioSemanal
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +17,14 @@ class PacienteViewModel : ViewModel() {
 
     private val _registrosDiarios = MutableStateFlow<List<RegistroDiario>>(emptyList())
     val registrosDiarios: StateFlow<List<RegistroDiario>> = _registrosDiarios
+
+    private val _paciente = MutableStateFlow<Paciente?>(null)
+
+    val paciente: StateFlow<Paciente?> = _paciente
+
+    private val _relatorios = MutableStateFlow<List< RelatorioSemanal>>(emptyList())
+
+    val relatorios: StateFlow<List< RelatorioSemanal>> = _relatorios
 
     fun loadRegistrosDiarios(nomeUsuario: String) {
         viewModelScope.launch {
@@ -33,6 +43,32 @@ class PacienteViewModel : ViewModel() {
                 repository.cadastrarRegistroDiario(registroDiario, nomeUsuario)
             } catch (e: Exception) {
 
+            }
+        }
+    }
+
+    fun loadDadosPaciente(nomeUsuario: String) {
+        viewModelScope.launch {
+            try {
+                val retorno = repository.retornarDadosPaciente(nomeUsuario)
+                Log.i("PACIENTE", "Paciente retornado: $retorno")
+                _paciente.value = retorno
+            } catch (e: Exception) {
+                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                _paciente.value = null
+            }
+        }
+    }
+
+    fun loadRelatoriosSemanais(nomeUsuario: String) {
+        viewModelScope.launch {
+            try {
+                val retorno = repository.retornarRelatoriosSemanais(nomeUsuario)
+                Log.i("RELATORIOS", "Relatórios retornados: $retorno")
+                _relatorios.value = retorno
+            } catch (e: Exception) {
+                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                _relatorios.value = emptyList()
             }
         }
     }

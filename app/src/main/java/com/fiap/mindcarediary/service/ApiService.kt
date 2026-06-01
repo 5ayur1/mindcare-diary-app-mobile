@@ -2,6 +2,7 @@ package com.fiap.mindcarediary.service
 
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -12,8 +13,12 @@ data class Paciente (
     val senha: String,
     val nomeCompleto: String,
     val dataNascimento: String,
+    val dataHoraAtivacao: String,
     val ativo: Boolean,
-    val estadoPaciente: String
+    val estadoPaciente: String,
+    val profissional: Profissional?,
+    val consultas: List<Consulta> = emptyList()
+
 )
 
 data class Profissional (
@@ -21,7 +26,10 @@ data class Profissional (
     val senha: String,
     val nomeCompleto: String,
     val dataNascimento: String,
-    val tipoProfissional: TipoProfissional
+    val dataHoraAtivacao: String,
+    val ativo: Boolean,
+    val tipoProfissional: TipoProfissional,
+    val consultas: List<Consulta> = emptyList()
 )
 
 data class RegistroDiario (
@@ -35,16 +43,18 @@ data class RelatorioSemanal (
     val paciente: Paciente,
     val faixaDeDatas: String,
     val relatorioIA: String,
-    val observacoes: String,
-    val recomendacoes: String,
+    var observacoes: String,
+    var recomendacoes: String,
     val registrosDiarios: List<RegistroDiario>,
     val dataHoraCriacao: String,
     val totalPositivos: Int,
     val totalNegativos: Int,
+    val resumo: String
 )
 
 data class Consulta (
     val profissional: Profissional?,
+    val paciente: Paciente?,
     val atendida: Boolean,
     val cancelada: Boolean,
     val dataHoraConsulta: String?
@@ -86,7 +96,19 @@ interface ApiService {
 
     @GET("relatoriosSemanais/{nomeUsuario}")
     suspend fun carregarRelatoriosSemanais(@Path("nomeUsuario") nomeUsuario: String): List<RelatorioSemanal>
+    @GET("profissionais/{nomeUsuario}/pacientes")
+    suspend fun carregarPacientes(@Path("nomeUsuario") nomeUsuario: String): List<Paciente>
 
+    @GET("pacientes/{nomeUsuario}")
+    suspend fun retornarDadosPaciente(@Path("nomeUsuario") nomeUsuario: String): Paciente
 
+    @GET("relatoriosSemanais/{nomeUsuario}")
+    suspend fun retornarRelatoriosSemanais(@Path("nomeUsuario") nomeUsuario: String): List<RelatorioSemanal>
+
+    @PATCH("relatoriosSemanais/atualizarRelatorioSemanal")
+    suspend fun atualizarRelatorioSemanal(@Body relatorioSemanal: RelatorioSemanal)
+
+    @POST("relatoriosSemanais/gerar/{nomeUsuario}")
+    suspend fun gerarRelatorioSemanal(@Path("nomeUsuario") nomeUsuario: String): RelatorioSemanal
 
 }

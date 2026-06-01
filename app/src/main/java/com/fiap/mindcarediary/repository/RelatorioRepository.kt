@@ -10,4 +10,12 @@ class RelatorioRepository {
         return RetrofitClient.api.carregarRelatoriosSemanais(nomeUsuario)
     }
 
+    suspend fun atualizarRelatorioSemanal(relatorioSemanal: RelatorioSemanal) {
+        return RetrofitClient.api.atualizarRelatorioSemanal(relatorioSemanal)
+    }
+
+    suspend fun gerarRelatorioSemanal(nomeUsuario: String): RelatorioSemanal {
+        return RetrofitClient.api.gerarRelatorioSemanal(nomeUsuario)
+    }
+
 }
