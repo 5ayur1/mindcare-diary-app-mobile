@@ -13,6 +13,12 @@
         android:theme="@style/Theme.MindcareDiary"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".paciente.AgendamentoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".paciente.RelatorioActivity"
+            android:exported="false" />
+        <activity
             android:name=".paciente.DiarioPacienteActivity"
             android:exported="false" />
         <activity

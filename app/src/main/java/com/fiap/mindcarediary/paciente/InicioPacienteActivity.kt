@@ -6,7 +6,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -14,14 +25,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,14 +84,13 @@ fun converteParaEmoji(nivelHumor: String): String {
 @Composable
 fun InicioPacienteTela(email: String) {
 
-    val context = LocalContext.current
     var viewModel: PacienteViewModel = viewModel()
+
+    val registrosDiarios by viewModel.registrosDiarios.collectAsState()
 
     LaunchedEffect(email) {
         viewModel.loadRegistrosDiarios(email)
     }
-
-    val registrosDiarios by viewModel.registrosDiarios.collectAsState()
 
     val background = Color(0xFFDDF1FA)
     val pink = Color(0xFFE78BC3)
@@ -91,48 +104,134 @@ fun InicioPacienteTela(email: String) {
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(background)
-    ) {
-
-        // TOPO
-        Row(
+    Scaffold(
+        bottomBar = {
+            BottomMenuInicio(bottomBar, email)
+        }
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    pink,
-                    RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
-                )
-                .padding(16.dp),
-            verticalAlignment = Alignment.Top
+                .fillMaxSize()
+                .padding(padding)
+                .background(background)
         ) {
 
+            TopMenuInicio(email, pink, dark)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
             Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(Color.White),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("👩", fontSize = 24.sp)
+                ActionButton(
+                    text = "Agendar Consulta",
+                    color = Color(0xFF7D59E6),
+                    email = email
+                )
             }
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
+            // RECENTES
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Text(
-                    text = "MindCare Diary",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    tint = Color(0xFFFF4BA0)
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "Recentes",
+                    color = dark,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                items(items) { item ->
+                    DiaryCard(item)
+                }
+            }
+
+
+        }
+    }
+}
+
+@Composable
+fun TopMenuInicio(email: String, pink: Color, dark: Color)
+{
+    // TOPO
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .clip(
+                RoundedCornerShape(
+                    bottomStart = 30.dp,
+                    bottomEnd = 30.dp
+                )
+            )
+            .background(pink)
+    ) {
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
+        ) {
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                    Arrangement.SpaceBetween,
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("👩", fontSize = 24.sp)
+                }
+
+                Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = null
+                )
+            }
+
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
+
+            Row(
+                verticalAlignment =
+                    Alignment.CenterVertically
+            ) {
+
+                Spacer(
+                    modifier = Modifier.width(18.dp)
+                )
 
                 Text(
                     text = "Olá $email,\ncomo você está se sentindo hoje?",
@@ -141,113 +240,86 @@ fun InicioPacienteTela(email: String) {
                     fontSize = 18.sp
                 )
             }
-
-            Icon(
-                imageVector = Icons.Default.ExitToApp,
-                contentDescription = "Sair",
-                tint = Color.Black,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // RECENTES
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.CalendarMonth,
-                contentDescription = null,
-                tint = Color(0xFFFF4BA0)
-            )
-
-            Spacer(modifier = Modifier.width(6.dp))
-
-            Text(
-                text = "Recentes",
-                color = dark,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-
-            items(items) { item ->
-                DiaryCard(item)
-            }
-        }
-
-        // MENU INFERIOR
-        NavigationBar(
-            containerColor = bottomBar
-        ) {
-
-            NavigationBarItem(
-                selected = true,
-                onClick = { },
-                icon = {
-                    Icon(
-                        Icons.Default.CalendarMonth,
-                        contentDescription = null
-                    )
-                },
-                label = { Text("Início") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFFFF3D9B),
-                    selectedTextColor = Color(0xFFFF3D9B),
-                    indicatorColor = Color.Transparent
-                )
-            )
-
-            NavigationBarItem(
-                selected = false,
-                onClick = {
-                    val intent = Intent(context, DiarioPacienteActivity::class.java)
-                    intent.putExtra("email", email)
-                    context.startActivity(intent)
-                },
-                icon = {
-                    Icon(
-                        Icons.Default.Article,
-                        contentDescription = null
-                    )
-                },
-                label = { Text("Diário") },
-                colors = NavigationBarItemDefaults.colors(
-                    unselectedIconColor = Color(0xFFFF3D9B),
-                    unselectedTextColor = Color(0xFFFF3D9B),
-                    indicatorColor = Color.Transparent
-                )
-            )
-
-            NavigationBarItem(
-                selected = false,
-                onClick = { },
-                icon = {
-                    Icon(
-                        Icons.Default.Lock,
-                        contentDescription = null
-                    )
-                },
-                label = { Text("Relatório") },
-                colors = NavigationBarItemDefaults.colors(
-                    unselectedIconColor = Color(0xFFFF3D9B),
-                    unselectedTextColor = Color(0xFFFF3D9B),
-                    indicatorColor = Color.Transparent
-                )
-            )
         }
     }
 }
+
+
+@Composable
+fun BottomMenuInicio(
+    bottomBar: Color,
+    email: String
+){
+
+    val context = LocalContext.current
+
+    // MENU INFERIOR
+    NavigationBar(
+        containerColor = bottomBar
+    ) {
+
+        NavigationBarItem(
+            selected = true,
+            onClick = { },
+            icon = {
+                Icon(
+                    Icons.Default.CalendarMonth,
+                    contentDescription = null
+                )
+            },
+            label = { Text("Início") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFFFF3D9B),
+                selectedTextColor = Color(0xFFFF3D9B),
+                indicatorColor = Color.Transparent
+            )
+        )
+
+        NavigationBarItem(
+            selected = false,
+            onClick = {
+                val intent = Intent(context, DiarioPacienteActivity::class.java)
+                intent.putExtra("email", email)
+                context.startActivity(intent)
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Article,
+                    contentDescription = null
+                )
+            },
+            label = { Text("Diário") },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = Color(0xFFFF3D9B),
+                unselectedTextColor = Color(0xFFFF3D9B),
+                indicatorColor = Color.Transparent
+            )
+        )
+
+        NavigationBarItem(
+            selected = false,
+            onClick = {
+                val intent = Intent(context, RelatorioActivity::class.java)
+                intent.putExtra("email", email)
+                context.startActivity(intent)
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = null
+                )
+            },
+            label = { Text("Relatório") },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = Color(0xFFFF3D9B),
+                unselectedTextColor = Color(0xFFFF3D9B),
+                indicatorColor = Color.Transparent
+            )
+        )
+    }
+}
+
+
 
 @Composable
 fun DiaryCard(item: DiaryItem) {
@@ -288,5 +360,36 @@ fun DiaryCard(item: DiaryItem) {
                 )
             }
         }
+    }
+}
+@Composable
+fun ActionButton(
+    text: String,
+    color: Color,
+    email: String
+) {
+
+    val context = LocalContext.current
+
+    Button(
+        onClick = {
+            val intent = Intent(context, AgendamentoActivity::class.java)
+            intent.putExtra("email", email);
+            context.startActivity(intent)
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = color
+        ),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth(0.7f)
+            .height(60.dp),
+    ) {
+
+        Text(
+            text = text,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
