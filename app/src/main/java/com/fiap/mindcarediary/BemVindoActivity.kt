@@ -1,7 +1,6 @@
 package com.fiap.mindcarediary
 
 import android.content.Intent
-import android.graphics.Color.blue
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

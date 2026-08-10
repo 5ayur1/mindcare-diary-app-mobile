@@ -1,9 +1,14 @@
 package com.fiap.mindcarediary.service
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.time.LocalDateTime
@@ -65,6 +70,18 @@ data class RecomendacaoHorario (
     val dataHoraConsulta: String
 )
 
+data class Prescription(
+    val number: String,
+    val issueDate: String,
+    val expirationDate: String,
+    val daysRemaining: String,
+    val doctorInfo: Profissional,
+    val medicines: List<String>,
+    val controlled: Boolean,
+    val valid: Boolean
+)
+
+
 enum class TipoProfissional {
     PSICOLOGO,
     PSIQUIATRA
@@ -111,4 +128,11 @@ interface ApiService {
     @POST("relatoriosSemanais/gerar/{nomeUsuario}")
     suspend fun gerarRelatorioSemanal(@Path("nomeUsuario") nomeUsuario: String): RelatorioSemanal
 
+    @GET("pacientes/{nomeUsuario}/prescriptions")
+    suspend fun retornarPrescricoes(@Path("nomeUsuario") nomeUsuario: String): List<Prescription>
+
+    @Multipart
+    @POST("pacientes/{nomeUsuario}/prescriptions")
+    suspend fun salvarPrescricao(@Path("nomeUsuario") nomeUsuario: String, @Part("profissionalNomeUsuario") profissionalNomeUsuario: RequestBody, @Part("issueDate") issueDate: RequestBody, @Part("expirationDate") expirationDate: RequestBody,
+                                 @Part("medicines") medicines: RequestBody, @Part("controlled") controlled: RequestBody, @Part arquivo: MultipartBody.Part): Response<Unit>
 }

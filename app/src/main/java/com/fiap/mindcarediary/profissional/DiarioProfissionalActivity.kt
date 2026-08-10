@@ -264,7 +264,7 @@ private fun HeaderPaciente(
                     }
 
                     Text(
-                        text = "Histórico e relatórios",
+                        text = "Ficha do Paciente",
                         fontSize = 16.sp,
                         color = Color.Black
                     )
@@ -323,6 +323,34 @@ private fun HeaderPaciente(
                         text = "Relatórios",
                         color =
                             if (abaSelecionada == 1)
+                                Color(0xFFB04DE6)
+                            else
+                                Color.White
+                    )
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        onAbaSelecionada(2)
+                        val intent = Intent(context, PrescricaoProfissionalActivity::class.java)
+                        intent.putExtra("email", email)
+                        intent.putExtra("pacienteNomeUsuario", paciente?.nomeUsuario)
+                        context.startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                            if (abaSelecionada == 2)
+                                Color.White
+                            else
+                                Color(0xFFD5A8EE)
+                    )
+                ) {
+
+                    Text(
+                        text = "Prescrição",
+                        color =
+                            if (abaSelecionada == 2)
                                 Color(0xFFB04DE6)
                             else
                                 Color.White

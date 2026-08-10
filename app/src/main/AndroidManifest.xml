@@ -34,6 +34,12 @@
             android:name=".profissional.RelatorioProfissionalActivity"
             android:exported="false" />
         <activity
+            android:name=".profissional.PrescricaoProfissionalActivity"
+            android:exported="false" />
+        <activity
+            android:name=".profissional.NovaPrescricaoProfissionalActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity

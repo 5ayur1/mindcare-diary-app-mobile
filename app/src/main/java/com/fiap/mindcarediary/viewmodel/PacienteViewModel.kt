@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiap.mindcarediary.repository.PacienteRepository
 import com.fiap.mindcarediary.service.Paciente
+import com.fiap.mindcarediary.service.Prescription
 import com.fiap.mindcarediary.service.RegistroDiario
 import com.fiap.mindcarediary.service.RelatorioSemanal
 import kotlinx.coroutines.launch
@@ -22,9 +23,13 @@ class PacienteViewModel : ViewModel() {
 
     val paciente: StateFlow<Paciente?> = _paciente
 
-    private val _relatorios = MutableStateFlow<List< RelatorioSemanal>>(emptyList())
+    private val _relatorios = MutableStateFlow<List<RelatorioSemanal>>(emptyList())
 
-    val relatorios: StateFlow<List< RelatorioSemanal>> = _relatorios
+    val relatorios: StateFlow<List<RelatorioSemanal>> = _relatorios
+
+    private val _prescriptions = MutableStateFlow<List<Prescription>>(emptyList())
+
+    val prescriptions: StateFlow<List<Prescription>> = _prescriptions
 
     fun loadRegistrosDiarios(nomeUsuario: String) {
         viewModelScope.launch {
@@ -69,6 +74,19 @@ class PacienteViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
                 _relatorios.value = emptyList()
+            }
+        }
+    }
+
+    fun loadPrescriptions(nomeUsuario: String) {
+        viewModelScope.launch {
+            try {
+                val retorno = repository.retornarPrescricoes(nomeUsuario)
+                Log.i("PRESCRIPTIONS", "Prescrições retornadas: $retorno")
+                _prescriptions.value = retorno
+            } catch (e: Exception) {
+                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                _prescriptions.value = emptyList()
             }
         }
     }

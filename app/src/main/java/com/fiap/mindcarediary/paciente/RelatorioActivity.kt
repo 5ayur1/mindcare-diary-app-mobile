@@ -188,9 +188,9 @@ fun RelatorioCard(
 ) {
     val quantidadePositivos = relatorio.totalPositivos
     val quantidadeNegativos = relatorio.totalNegativos
-    val rangeDates = relatorio.faixaDeDatas.split("ˆ")
-    val initialDate = rangeDates[0].split("T")[0]
-    val finalDate = rangeDates[1].split("T")[0]
+    val rangeDates = relatorio.faixaDeDatas.split("^")
+    val initialDate = rangeDates[0]
+    val finalDate = rangeDates[1]
 
     Card(
         modifier = Modifier
