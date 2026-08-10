@@ -576,7 +576,7 @@ private fun DateInformation(
             modifier = Modifier.weight(1f),
             title = "Emissão",
             value = prescription.issueDate,
-            subtitle = null,
+            subtitle = "",
             background = Color(0xFFF5F5F5),
             borderColor = BorderGray,
             titleColor = TextGray,
@@ -587,7 +587,7 @@ private fun DateInformation(
             modifier = Modifier.weight(1f),
             title = "Vencimento",
             value = prescription.expirationDate,
-            subtitle = prescription.daysRemaining,
+            subtitle = prescription.daysRemaining + " dias restantes",
             background = if (prescription.valid)
                 LightGreen
             else
