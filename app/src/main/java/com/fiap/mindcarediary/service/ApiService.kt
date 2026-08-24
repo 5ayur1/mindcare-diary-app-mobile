@@ -2,6 +2,7 @@ package com.fiap.mindcarediary.service
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -34,7 +35,8 @@ data class Profissional (
     val dataHoraAtivacao: String,
     val ativo: Boolean,
     val tipoProfissional: TipoProfissional,
-    val consultas: List<Consulta> = emptyList()
+    val consultas: List<Consulta> = emptyList(),
+    val registroProfissional: String
 )
 
 data class RegistroDiario (
@@ -74,6 +76,17 @@ data class Prescription(
     val number: String,
     val issueDate: String,
     val expirationDate: String,
+    val daysRemaining: Int,
+    val profissional: Profissional,
+    val medicines: List<String>,
+    val controlled: Boolean,
+    val valid: Boolean
+)
+
+data class PrescriptionDcoument(
+    val prescription: Prescription,
+    val issueDate: String,
+    val expirationDate: String,
     val daysRemaining: String,
     val doctorInfo: Profissional,
     val medicines: List<String>,
@@ -81,12 +94,35 @@ data class Prescription(
     val valid: Boolean
 )
 
-
 enum class TipoProfissional {
     PSICOLOGO,
     PSIQUIATRA
 }
 
+sealed class PdfState {
+
+    data object Idle : PdfState()
+
+    data object Loading : PdfState()
+
+    data class Success(
+        val pdfBytes: MultipartBody.Part
+    ) : PdfState()
+
+    data class Error(
+        val message: String
+    ) : PdfState()
+}
+
+data class LoginRequest (
+    val nomeUsuario: String,
+    val senha: String
+)
+
+data class LoginResponse(
+    val token: String,
+    val userRole: String
+)
 
 interface ApiService {
 
@@ -128,11 +164,18 @@ interface ApiService {
     @POST("relatoriosSemanais/gerar/{nomeUsuario}")
     suspend fun gerarRelatorioSemanal(@Path("nomeUsuario") nomeUsuario: String): RelatorioSemanal
 
-    @GET("pacientes/{nomeUsuario}/prescriptions")
-    suspend fun retornarPrescricoes(@Path("nomeUsuario") nomeUsuario: String): List<Prescription>
-
     @Multipart
     @POST("pacientes/{nomeUsuario}/prescriptions")
     suspend fun salvarPrescricao(@Path("nomeUsuario") nomeUsuario: String, @Part("profissionalNomeUsuario") profissionalNomeUsuario: RequestBody, @Part("issueDate") issueDate: RequestBody, @Part("expirationDate") expirationDate: RequestBody,
                                  @Part("medicines") medicines: RequestBody, @Part("controlled") controlled: RequestBody, @Part arquivo: MultipartBody.Part): Response<Unit>
+
+    @POST("prescriptions/{profissionalNomeUsuario}/{number}/pdf")
+    suspend fun downloadPrescriptionPdf(
+        @Path("profissionalNomeUsuario") profissionalNomeUsuario: String, @Path("number") number: String): Response<ResponseBody>
+
+    @GET("pacientes/{nomeUsuario}/prescriptions")
+    suspend fun retornarPrescricoes(@Path("nomeUsuario") nomeUsuario: String): Response<List<Prescription>>
+
+    @POST("login")
+    suspend fun efetuarLogin(@Body dados: LoginRequest): Response<LoginResponse>
 }

@@ -82,8 +82,13 @@ class PacienteViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val retorno = repository.retornarPrescricoes(nomeUsuario)
-                Log.i("PRESCRIPTIONS", "Prescrições retornadas: $retorno")
-                _prescriptions.value = retorno
+                if(retorno.isSuccessful) {
+                    Log.i("PRESCRIPTIONS", "Prescrições retornadas: $retorno")
+                    val body = retorno.body()
+                    if(body != null) {
+                        _prescriptions.value = body
+                    }
+                }
             } catch (e: Exception) {
                 Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
                 _prescriptions.value = emptyList()

@@ -11,7 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MindcareDiary"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:name=".MindCareApplication">
+        <activity
+            android:name=".paciente.PdfViewerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".paciente.MinhasPrescricoesActivity"
+            android:exported="false" />
         <activity
             android:name=".paciente.AgendamentoActivity"
             android:exported="false" />

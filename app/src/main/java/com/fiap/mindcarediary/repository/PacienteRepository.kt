@@ -5,6 +5,7 @@ import com.fiap.mindcarediary.service.Prescription
 import com.fiap.mindcarediary.service.RegistroDiario
 import com.fiap.mindcarediary.service.RelatorioSemanal
 import com.fiap.mindcarediary.service.RetrofitClient
+import retrofit2.Response
 
 class PacienteRepository {
 
@@ -24,7 +25,7 @@ class PacienteRepository {
         return RetrofitClient.api.retornarRelatoriosSemanais(nomeUsuario)
     }
 
-    suspend fun retornarPrescricoes(nomeUsuario: String): List<Prescription> {
+    suspend fun retornarPrescricoes(nomeUsuario: String): Response<List<Prescription>> {
         return RetrofitClient.api.retornarPrescricoes(nomeUsuario)
     }
 }

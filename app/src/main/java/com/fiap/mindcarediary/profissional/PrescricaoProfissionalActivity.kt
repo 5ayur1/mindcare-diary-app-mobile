@@ -587,7 +587,7 @@ private fun DateInformation(
             modifier = Modifier.weight(1f),
             title = "Vencimento",
             value = prescription.expirationDate,
-            subtitle = prescription.daysRemaining + " dias restantes",
+            subtitle = prescription.daysRemaining.toString() + " dias restantes",
             background = if (prescription.valid)
                 LightGreen
             else
@@ -706,14 +706,14 @@ private fun DoctorInformation(
         Column {
 
             Text(
-                text = prescription.doctorInfo.nomeCompleto,
+                text = prescription.profissional.nomeCompleto,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextDark
             )
 
             Text(
-                text = prescription.doctorInfo.tipoProfissional.toString(),
+                text = prescription.profissional.tipoProfissional.toString(),
                 fontSize = 12.sp,
                 color = TextDark
             )

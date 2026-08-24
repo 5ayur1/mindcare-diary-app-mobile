@@ -1,6 +1,5 @@
 package com.fiap.mindcarediary.profissional
 
-import PrescriptionViewModel
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -62,6 +61,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import com.fiap.mindcarediary.viewmodel.PrescriptionViewModel
 import okhttp3.MultipartBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody

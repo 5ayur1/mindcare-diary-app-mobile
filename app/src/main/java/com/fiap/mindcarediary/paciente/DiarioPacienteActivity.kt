@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Save
@@ -36,6 +38,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -342,25 +345,57 @@ fun BottomMenuDiario(
             icon = { Icon(Icons.Default.CalendarMonth, null) },
             label = { Text("Início") }
         )
+
         NavigationBarItem(
             selected = true,
             onClick = {
                 val intent = Intent(context, DiarioPacienteActivity::class.java)
-                intent.putExtra("email", email);
+                intent.putExtra("email", email)
                 context.startActivity(intent)
             },
-            icon = { Icon(Icons.Default.Article, null) },
-            label = { Text("Diário") }
+            icon = {
+                Icon(
+                    Icons.Default.Article,
+                    contentDescription = null
+                )
+            },
+            label = { Text("Diário") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFFFF3D9B),
+                selectedTextColor = Color(0xFFFF3D9B),
+                indicatorColor = Color.Transparent
+            )
         )
+
         NavigationBarItem(
             selected = false,
             onClick = {
                 val intent = Intent(context, RelatorioActivity::class.java)
-                intent.putExtra("email", email);
+                intent.putExtra("email", email)
                 context.startActivity(intent)
             },
-            icon = { Icon(Icons.Default.Lock, null) },
+            icon = {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = null
+                )
+            },
             label = { Text("Relatório") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = {
+                val intent = Intent(context, MinhasPrescricoesActivity::class.java)
+                intent.putExtra("email", email)
+                context.startActivity(intent)
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Healing,
+                    contentDescription = "Prescrição"
+                )
+            },
+            label = { Text("Prescrição") }
         )
     }
 }

@@ -1,13 +1,23 @@
+package com.fiap.mindcarediary.viewmodel
+
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiap.mindcarediary.profissional.uriToPdfPart
 import com.fiap.mindcarediary.repository.PrescriptionRepository
+import com.fiap.mindcarediary.service.PdfState
+import com.fiap.mindcarediary.service.Prescription
+import com.fiap.mindcarediary.service.RegistroDiario
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+
+
 
 class PrescriptionViewModel : ViewModel() {
 
@@ -30,6 +40,13 @@ class PrescriptionViewModel : ViewModel() {
 
     val error =
         _error.asStateFlow()
+
+    private val _pdfState = MutableStateFlow<PdfState>(PdfState.Idle)
+    val pdfState: StateFlow<PdfState> = _pdfState.asStateFlow()
+
+    private val _receitas = MutableStateFlow<List<Prescription>>(emptyList())
+
+    val receitas: StateFlow<List<Prescription>> = _receitas
 
     fun enviarPrescricao(
         context: Context,
@@ -57,7 +74,7 @@ class PrescriptionViewModel : ViewModel() {
                     )
 
                 val response =
-                        repository
+                    repository
                         .salvarPrescricao(
 
                             nomeUsuario =
@@ -101,6 +118,72 @@ class PrescriptionViewModel : ViewModel() {
             } finally {
 
                 _isLoading.value = false
+            }
+        }
+    }
+
+
+    fun onDownloadPdf(
+        receita: Prescription,
+        onSuccess: (ByteArray) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+
+                Log.i(
+                    "DOWNLOAD_PDF",
+                    "profissional=${receita.profissional.nomeUsuario}, " +
+                            "number=${receita.number}"
+                )
+
+                val response = repository.downloadPrescricaoPdf(
+                    profissionalNomeUsuario =
+                        receita.profissional.nomeUsuario,
+                    number = receita.number
+                )
+
+                if (response.isSuccessful) {
+
+                    val body = response.body()
+
+                    if (body != null) {
+                        onSuccess(body.bytes())
+                    } else {
+                        onError("PDF não encontrado.")
+                    }
+
+                } else {
+                    onError(
+                        "Erro ao baixar PDF: ${response.code()}"
+                    )
+                }
+
+            } catch (e: Exception) {
+                onError(
+                    e.message ?: "Erro ao baixar a receita."
+                )
+            }
+        }
+    }
+
+    fun clearPdfState() {
+        _pdfState.value = PdfState.Idle
+    }
+
+    fun retornarReceitasPorPaciente(pacienteNomeUsuario: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.retornarReceitasPorPaciente(pacienteNomeUsuario)
+                if(response.isSuccessful) {
+                    val body = response.body();
+                    if (body != null) {
+                        _receitas.value = body
+                    }
+                }
+            } catch (e: Exception) {
+                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                _receitas.value = emptyList()
             }
         }
     }

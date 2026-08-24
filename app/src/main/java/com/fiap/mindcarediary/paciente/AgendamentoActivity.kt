@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
@@ -43,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -552,7 +554,12 @@ fun BottomNavigationBar(
                     contentDescription = "Início"
                 )
             },
-            label = { Text("Início") }
+            label = { Text("Início") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFFFF3D9B),
+                selectedTextColor = Color(0xFFFF3D9B),
+                indicatorColor = Color.Transparent
+            )
         )
 
         NavigationBarItem(
@@ -585,6 +592,22 @@ fun BottomNavigationBar(
                 )
             },
             label = { Text("Relatório") }
+        )
+
+        NavigationBarItem(
+            selected = false,
+            onClick = {
+                val intent = Intent(context, MinhasPrescricoesActivity::class.java)
+                intent.putExtra("email", email)
+                context.startActivity(intent)
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Healing,
+                    contentDescription = "Prescrição"
+                )
+            },
+            label = { Text("Prescrição") }
         )
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.Button
@@ -288,12 +289,7 @@ fun BottomMenuInicio(
                     contentDescription = null
                 )
             },
-            label = { Text("Diário") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = Color(0xFFFF3D9B),
-                unselectedTextColor = Color(0xFFFF3D9B),
-                indicatorColor = Color.Transparent
-            )
+            label = { Text("Diário") }
         )
 
         NavigationBarItem(
@@ -309,12 +305,23 @@ fun BottomMenuInicio(
                     contentDescription = null
                 )
             },
-            label = { Text("Relatório") },
-            colors = NavigationBarItemDefaults.colors(
-                unselectedIconColor = Color(0xFFFF3D9B),
-                unselectedTextColor = Color(0xFFFF3D9B),
-                indicatorColor = Color.Transparent
-            )
+            label = { Text("Relatório") }
+        )
+
+        NavigationBarItem(
+            selected = false,
+            onClick = {
+                val intent = Intent(context, MinhasPrescricoesActivity::class.java)
+                intent.putExtra("email", email)
+                context.startActivity(intent)
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Healing,
+                    contentDescription = "Prescrição"
+                )
+            },
+            label = { Text("Prescrição") }
         )
     }
 }

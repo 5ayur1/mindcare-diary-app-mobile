@@ -3,11 +3,9 @@ package com.fiap.mindcarediary.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fiap.mindcarediary.repository.PacienteRepository
 import com.fiap.mindcarediary.repository.ProfissionalRepository
 import com.fiap.mindcarediary.service.Paciente
 import com.fiap.mindcarediary.service.Profissional
-import com.fiap.mindcarediary.service.RegistroDiario
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

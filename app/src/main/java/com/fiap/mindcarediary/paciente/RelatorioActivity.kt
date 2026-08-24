@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -408,7 +410,27 @@ fun BottomMenuRelatorio(email: String) {
             },
             label = {
                 Text("Relatório")
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = Color(0xFFFF3D9B),
+                selectedTextColor = Color(0xFFFF3D9B),
+                indicatorColor = Color.Transparent
+            )
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = {
+                val intent = Intent(context, MinhasPrescricoesActivity::class.java)
+                intent.putExtra("email", email)
+                context.startActivity(intent)
+            },
+            icon = {
+                Icon(
+                    Icons.Default.Healing,
+                    contentDescription = "Prescrição"
+                )
+            },
+            label = { Text("Prescrição") }
         )
     }
 }

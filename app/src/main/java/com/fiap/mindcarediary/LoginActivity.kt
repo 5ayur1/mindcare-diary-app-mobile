@@ -2,6 +2,7 @@ package com.fiap.mindcarediary
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,8 +42,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fiap.mindcarediary.paciente.InicioPacienteActivity
 import com.fiap.mindcarediary.profissional.InicioProfissionalActivity
+import com.fiap.mindcarediary.repository.AuthRepository
+import com.fiap.mindcarediary.service.LoginRequest
+import com.fiap.mindcarediary.service.RetrofitClient
+import com.fiap.mindcarediary.service.TokenManager
+import com.fiap.mindcarediary.viewmodel.LoginViewModel
+import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory
 
 class LoginActivity : ComponentActivity() {
 
@@ -60,21 +68,36 @@ class LoginActivity : ComponentActivity() {
 fun LoginTela(
     activity: LoginActivity = LoginActivity(),
     onGoogleClick: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {}
+    onForgotPasswordClick: () -> Unit = {},
 ) {
+
+    val context = LocalContext.current
+
+    val tokenManager = remember {
+        TokenManager(context.applicationContext)
+    }
+
+    val repository = remember {
+        AuthRepository(
+            tokenManager = tokenManager
+        )
+    }
+
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(repository)
+    )
 
     val tipoUsuario = activity.intent?.getStringExtra("tipoUsuario") ?: "Unknown"
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var nomeUsuario by remember { mutableStateOf("") }
+    var senha by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
+
 
     val background = Color(0xFFDCEFFA)
     val darkBlue = Color(0xFF10104D)
     val pink = Color(0xFFE63B96)
     val blue = Color(0xFF1E88E5)
-
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -107,8 +130,8 @@ fun LoginTela(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = nomeUsuario,
+            onValueChange = { nomeUsuario = it },
             placeholder = { Text("name@example.com") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -131,8 +154,8 @@ fun LoginTela(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = senha,
+            onValueChange = { senha = it },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             visualTransformation = if (showPassword)
@@ -162,21 +185,63 @@ fun LoginTela(
 
         Button(
             onClick = {
-                if("paciente".equals(tipoUsuario)) {
-                        val intent = Intent(context, InicioPacienteActivity::class.java)
-                        intent.putExtra("email", email)
-                        intent.putExtra("senha", password)
-                        context.startActivity(intent)
-                } else if("profissional".equals(tipoUsuario)) {
-                    val intent = Intent(context, InicioProfissionalActivity::class.java)
-                    intent.putExtra("email", email)
-                    intent.putExtra("senha", password)
-                    context.startActivity(intent)
-                }
+                loginViewModel.efetuarLogin(
+                    nomeUsuario = nomeUsuario,
+                    senha = senha,
+                    onSuccess = { loginResponse ->
+
+                        if (
+                            "PACIENTE".equals(
+                                loginResponse.userRole,
+                                ignoreCase = true
+                            )
+                        ) {
+
+                            val intent = Intent(
+                                context,
+                                InicioPacienteActivity::class.java
+                            )
+
+                            intent.putExtra(
+                                "email",
+                                nomeUsuario
+                            )
+
+                            context.startActivity(intent)
+
+                        } else if (
+                            "PROFISSIONAL".equals(
+                                loginResponse.userRole,
+                                ignoreCase = true
+                            )
+                        ) {
+
+                            val intent = Intent(
+                                context,
+                                InicioProfissionalActivity::class.java
+                            )
+
+                            intent.putExtra(
+                                "email",
+                                nomeUsuario
+                            )
+
+                            context.startActivity(intent)
+                        }
+                    },
+                    onError = { message ->
+                        Toast.makeText(
+                            context,
+                            message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+
             colors = ButtonDefaults.buttonColors(
                 containerColor = pink
             )
