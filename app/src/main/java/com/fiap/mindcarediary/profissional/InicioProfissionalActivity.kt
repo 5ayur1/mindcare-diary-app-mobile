@@ -193,6 +193,8 @@ private fun HeaderSection(
 
                 IconButton(onClick = {
                     loginViewModel.logout()
+                    val intent = Intent(context, BemVindoActivity::class.java)
+                    context.startActivity(intent)
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Logout,

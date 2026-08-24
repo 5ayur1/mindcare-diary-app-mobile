@@ -2,6 +2,7 @@ package com.fiap.mindcarediary.paciente
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -344,7 +345,21 @@ fun AgendamentoTela(
                                 false,
                                 false,
                                 dateTimeFinal
-                            )
+                            ),
+                            onSuccess = { mensagem ->
+                                Toast.makeText(
+                                    context,
+                                    mensagem,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            },
+                            onError = { mensagem ->
+                                Toast.makeText(
+                                    context,
+                                    mensagem,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         )
 
                         val intent = Intent(context, InicioPacienteActivity::class.java)

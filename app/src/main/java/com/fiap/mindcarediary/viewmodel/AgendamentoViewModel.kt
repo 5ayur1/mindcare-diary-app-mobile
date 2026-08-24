@@ -29,12 +29,21 @@ class AgendamentoViewModel : ViewModel() {
         _tipoProfissional.value = tipo
     }
 
-    fun cadastrarAgendamento(consulta: Consulta) {
+    fun cadastrarAgendamento(
+        consulta: Consulta,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 repository.salvarAgendamento(consulta)
+                onSuccess(
+                    "Agendamento realizado com sucesso."
+                )
             } catch (e: Exception) {
-
+                onError(
+                    "Não foi possível realizar o agendamento."
+                )
             }
         }
     }

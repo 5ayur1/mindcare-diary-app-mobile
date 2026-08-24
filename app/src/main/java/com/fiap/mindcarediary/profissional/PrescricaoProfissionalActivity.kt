@@ -512,11 +512,6 @@ private fun PrescriptionTitle(
     }
 }
 
-
-// ---------------------------------------------------------
-// STATUS CHIP
-// ---------------------------------------------------------
-
 @Composable
 private fun StatusChip(
     text: String,
@@ -556,11 +551,6 @@ private fun StatusChip(
         )
     }
 }
-
-
-// ---------------------------------------------------------
-// DATE INFORMATION
-// ---------------------------------------------------------
 
 @Composable
 private fun DateInformation(
@@ -662,11 +652,6 @@ private fun InfoBox(
     }
 }
 
-
-// ---------------------------------------------------------
-// DOCTOR
-// ---------------------------------------------------------
-
 @Composable
 private fun DoctorInformation(
     prescription: Prescription
@@ -721,11 +706,6 @@ private fun DoctorInformation(
     }
 }
 
-
-// ---------------------------------------------------------
-// MEDICINES
-// ---------------------------------------------------------
-
 @Composable
 private fun MedicinesInformation(
     prescription: Prescription
@@ -779,11 +759,6 @@ private fun MedicinesInformation(
     }
 }
 
-
-// ---------------------------------------------------------
-// ACTIONS
-// ---------------------------------------------------------
-
 @Composable
 private fun PrescriptionActions(
     prescription: Prescription,
@@ -811,49 +786,5 @@ private fun PrescriptionActions(
             color = Color.LightGray,
             modifier = Modifier.weight(1f)
         )
-
-        Button(
-            onClick = onPdfClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFEAEAEA)
-            ),
-            shape = RoundedCornerShape(12.dp),
-            contentPadding = PaddingValues(
-                horizontal = 12.dp,
-                vertical = 8.dp
-            )
-        ) {
-
-            Text(
-                text = "📄",
-                fontSize = 14.sp
-            )
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            Text(
-                text = "PDF",
-                color = Color(0xFF555555),
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        IconButton(
-            onClick = onDeleteClick,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(11.dp))
-                .background(Color(0xFFFFE6E6))
-        ) {
-
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Excluir receita",
-                tint = Color(0xFFFF6B6B),
-                modifier = Modifier.size(20.dp)
-            )
-        }
     }
 }
