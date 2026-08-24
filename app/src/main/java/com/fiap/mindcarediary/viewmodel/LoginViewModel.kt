@@ -47,4 +47,13 @@ class LoginViewModel(private val repository: AuthRepository) : ViewModel() {
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                repository.clearToken()
+            } catch (e: Exception) {
+
+            }
+        }
+    }
 }

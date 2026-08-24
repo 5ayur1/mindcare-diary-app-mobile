@@ -27,4 +27,8 @@ class AuthRepository (
     suspend fun saveToken(token: String) {
         tokenManager.saveToken(token)
     }
+
+    suspend fun clearToken() {
+        tokenManager.clearToken()
+    }
 }

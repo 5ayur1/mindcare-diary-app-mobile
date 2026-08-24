@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,8 +28,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fiap.mindcarediary.BemVindoActivity
+import com.fiap.mindcarediary.LoginActivity
 import com.fiap.mindcarediary.paciente.InicioPacienteActivity
+import com.fiap.mindcarediary.repository.AuthRepository
 import com.fiap.mindcarediary.service.Paciente
+import com.fiap.mindcarediary.service.TokenManager
+import com.fiap.mindcarediary.viewmodel.LoginViewModel
+import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory
 import com.fiap.mindcarediary.viewmodel.ProfissionalViewModel
 
 class InicioProfissionalActivity: ComponentActivity() {
@@ -58,6 +65,22 @@ fun PainelProfissionalTela(email: String) {
             p -> "ATENCAO".equals(p.estadoPaciente)
     })
 
+    val context = LocalContext.current
+
+    val tokenManager = remember {
+        TokenManager(context.applicationContext)
+    }
+
+    val repository = remember {
+        AuthRepository(
+            tokenManager = tokenManager
+        )
+    }
+
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(repository)
+    )
+
     LaunchedEffect(email) {
         if (email != null) {
             profissionalViewModel.loadPacientes(email)
@@ -73,7 +96,7 @@ fun PainelProfissionalTela(email: String) {
                     .background(Color(0xFFEAF6FF))
             ) {
 
-                HeaderSection()
+                HeaderSection(loginViewModel)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -132,7 +155,11 @@ fun PainelProfissionalTela(email: String) {
 }
 
 @Composable
-private fun HeaderSection() {
+private fun HeaderSection(
+    loginViewModel: LoginViewModel
+) {
+
+    val context = LocalContext.current
 
     Surface(
         color = Color(0xFFB57BE2),
@@ -164,7 +191,9 @@ private fun HeaderSection() {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    loginViewModel.logout()
+                }) {
                     Icon(
                         imageVector = Icons.Outlined.Logout,
                         contentDescription = "Logout",

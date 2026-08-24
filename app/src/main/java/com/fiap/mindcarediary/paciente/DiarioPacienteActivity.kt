@@ -36,6 +36,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -56,7 +57,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fiap.mindcarediary.BemVindoActivity
+import com.fiap.mindcarediary.repository.AuthRepository
 import com.fiap.mindcarediary.service.RegistroDiario
+import com.fiap.mindcarediary.service.TokenManager
+import com.fiap.mindcarediary.viewmodel.LoginViewModel
+import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory
 import com.fiap.mindcarediary.viewmodel.PacienteViewModel
 
 class DiarioPacienteActivity: ComponentActivity() {
@@ -89,6 +95,20 @@ fun DiarioPacienteTela(
 
     val context = LocalContext.current
 
+    val tokenManager = remember {
+        TokenManager(context.applicationContext)
+    }
+
+    val repository = remember {
+        AuthRepository(
+            tokenManager = tokenManager
+        )
+    }
+
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(repository)
+    )
+
     Scaffold(
         bottomBar = { BottomMenuDiario(email) }
     ) { padding ->
@@ -99,7 +119,7 @@ fun DiarioPacienteTela(
                 .background(background)
         ) {
 
-            TopMenuDiario(pink)
+            TopMenuDiario(pink, loginViewModel)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -261,7 +281,12 @@ fun DiarioPacienteTela(
 }
 
 @Composable
-fun TopMenuDiario(pink: Color) {
+fun TopMenuDiario(
+    pink: Color,
+    loginViewModel: LoginViewModel
+) {
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -295,10 +320,16 @@ fun TopMenuDiario(pink: Color) {
                     modifier = Modifier.size(54.dp)
                 )
 
-                Icon(
-                    imageVector = Icons.Default.Logout,
-                    contentDescription = null
-                )
+                IconButton(onClick = {
+                    loginViewModel.logout()
+                    val intent = Intent(context, BemVindoActivity::class.java)
+                    context.startActivity(intent)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Logout,
+                        contentDescription = null
+                    )
+                }
             }
 
             Spacer(

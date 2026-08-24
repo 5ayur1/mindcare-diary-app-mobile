@@ -31,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -40,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +51,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fiap.mindcarediary.BemVindoActivity
+import com.fiap.mindcarediary.repository.AuthRepository
 import com.fiap.mindcarediary.service.RelatorioSemanal
+import com.fiap.mindcarediary.service.TokenManager
+import com.fiap.mindcarediary.viewmodel.LoginViewModel
+import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory
 import com.fiap.mindcarediary.viewmodel.RelatorioViewModel
 
 class RelatorioActivity : ComponentActivity() {
@@ -73,6 +80,22 @@ fun RelatorioTela(
 
     val relatorios by relatorioViewModel.relatorios.collectAsState();
 
+    val context = LocalContext.current
+
+    val tokenManager = remember {
+        TokenManager(context.applicationContext)
+    }
+
+    val repository = remember {
+        AuthRepository(
+            tokenManager = tokenManager
+        )
+    }
+
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(repository)
+    )
+
     LaunchedEffect(email) {
 
         if (email != null) {
@@ -93,7 +116,7 @@ fun RelatorioTela(
                 .background(Color(0xFFEAF6FC))
         ) {
 
-            HeaderRelatorio()
+            HeaderRelatorio(loginViewModel)
 
             Spacer (
                 modifier = Modifier.height(20.dp)
@@ -119,7 +142,11 @@ fun RelatorioTela(
 }
 
 @Composable
-fun HeaderRelatorio() {
+fun HeaderRelatorio(
+    loginViewModel: LoginViewModel
+) {
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -154,10 +181,16 @@ fun HeaderRelatorio() {
                     modifier = Modifier.size(54.dp)
                 )
 
-                Icon(
-                    imageVector = Icons.Default.Logout,
-                    contentDescription = null
-                )
+                IconButton(onClick = {
+                    loginViewModel.logout()
+                    val intent = Intent(context, BemVindoActivity::class.java)
+                    context.startActivity(intent)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Logout,
+                        contentDescription = null
+                    )
+                }
             }
 
             Spacer(

@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,8 +28,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,8 +48,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fiap.mindcarediary.paciente.InicioPacienteActivity
 import com.fiap.mindcarediary.profissional.InicioProfissionalActivity
 import com.fiap.mindcarediary.repository.AuthRepository
-import com.fiap.mindcarediary.service.LoginRequest
-import com.fiap.mindcarediary.service.RetrofitClient
 import com.fiap.mindcarediary.service.TokenManager
 import com.fiap.mindcarediary.viewmodel.LoginViewModel
 import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory

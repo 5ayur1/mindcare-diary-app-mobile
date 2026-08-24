@@ -1,6 +1,7 @@
 package com.fiap.mindcarediary.paciente
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
@@ -77,7 +78,10 @@ class PdfViewerActivity : ComponentActivity() {
 
         setContent {
             PdfViewerScreen(
-                pdfPath = pdfPath
+                pdfPath = pdfPath,
+                onBack = {
+                    finish()
+                }
             )
         }
     }
@@ -104,10 +108,9 @@ fun isPdfFile(file: File): Boolean {
 
 @Composable
 fun PdfViewerScreen(
-    pdfPath: String
+    pdfPath: String,
+    onBack: () -> Unit
 ) {
-    val context = LocalContext.current
-
     val file = remember(pdfPath) {
         File(pdfPath)
     }
@@ -120,30 +123,31 @@ fun PdfViewerScreen(
         mutableStateOf<PdfRenderer?>(null)
     }
 
-    var parcelFileDescriptor by remember {
-        mutableStateOf<ParcelFileDescriptor?>(null)
-    }
+    DisposableEffect(file) {
 
-    LaunchedEffect(file) {
+        var descriptor: ParcelFileDescriptor? = null
+        var renderer: PdfRenderer? = null
 
         try {
-
             if (!file.exists()) {
-                throw androidx.datastore.core.IOException("Arquivo não encontrado")
+                throw IllegalStateException(
+                    "Arquivo não encontrado"
+                )
             }
 
             if (file.length() == 0L) {
-                throw androidx.datastore.core.IOException("Arquivo PDF vazio")
+                throw IllegalStateException(
+                    "Arquivo PDF vazio"
+                )
             }
 
-            val pdf = ParcelFileDescriptor.open(
+            descriptor = ParcelFileDescriptor.open(
                 file,
                 ParcelFileDescriptor.MODE_READ_ONLY
             )
 
-            val renderer = PdfRenderer(pdf)
+            renderer = PdfRenderer(descriptor)
 
-            parcelFileDescriptor = pdf
             pdfRenderer = renderer
 
         } catch (e: Exception) {
@@ -156,14 +160,30 @@ fun PdfViewerScreen(
 
             errorMessage = "Não foi possível abrir o PDF."
         }
-    }
-
-    DisposableEffect(Unit) {
 
         onDispose {
 
-            pdfRenderer?.close()
-            parcelFileDescriptor?.close()
+            try {
+                renderer?.close()
+            } catch (e: Exception) {
+                Log.e(
+                    "PDF_DEBUG",
+                    "Erro ao fechar PdfRenderer",
+                    e
+                )
+            }
+
+            try {
+                descriptor?.close()
+            } catch (e: Exception) {
+                Log.e(
+                    "PDF_DEBUG",
+                    "Erro ao fechar ParcelFileDescriptor",
+                    e
+                )
+            }
+
+            pdfRenderer = null
         }
     }
 
@@ -174,7 +194,6 @@ fun PdfViewerScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             Text(
                 text = errorMessage ?: "Erro ao abrir PDF"
             )
@@ -196,7 +215,12 @@ fun PdfViewerScreen(
 
             IconButton(
                 onClick = {
-                    (context as? Activity)?.finish()
+                    Log.d(
+                        "PDF_DEBUG",
+                        "========== VOLTAR =========="
+                    )
+
+                    onBack()
                 }
             ) {
                 Icon(
@@ -215,7 +239,7 @@ fun PdfViewerScreen(
         pdfRenderer?.let { renderer ->
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -248,22 +272,26 @@ fun PdfPage(
 
         val page = pdfRenderer.openPage(pageIndex)
 
-        val bitmap = Bitmap.createBitmap(
-            page.width,
-            page.height,
-            Bitmap.Config.ARGB_8888
-        )
+        try {
 
-        page.render(
-            bitmap,
-            null,
-            null,
-            PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
-        )
+            val bitmap = Bitmap.createBitmap(
+                page.width,
+                page.height,
+                Bitmap.Config.ARGB_8888
+            )
 
-        page.close()
+            page.render(
+                bitmap,
+                null,
+                null,
+                PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+            )
 
-        bitmap
+            bitmap
+
+        } finally {
+            page.close()
+        }
     }
 
     Image(
