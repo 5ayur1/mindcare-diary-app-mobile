@@ -61,6 +61,7 @@ data class RelatorioSemanal (
 )
 
 data class Consulta (
+    val number: String?,
     val profissional: Profissional?,
     val paciente: Paciente?,
     val atendida: Boolean,
@@ -179,4 +180,7 @@ interface ApiService {
 
     @POST("login")
     suspend fun efetuarLogin(@Body dados: LoginRequest): Response<LoginResponse>
+
+    @GET("agendamentos/{nomeUsuario}")
+    suspend fun carregarConsultas(@Path("nomeUsuario") nomeUsuario: String): Response<List<Consulta>>
 }

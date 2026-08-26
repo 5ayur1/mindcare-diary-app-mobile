@@ -54,17 +54,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fiap.mindcarediary.BemVindoActivity
-import com.fiap.mindcarediary.LoginActivity
 import com.fiap.mindcarediary.repository.AuthRepository
 import com.fiap.mindcarediary.service.TokenManager
 import com.fiap.mindcarediary.viewmodel.LoginViewModel
 import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory
 import com.fiap.mindcarediary.viewmodel.PacienteViewModel
+import kotlin.jvm.java
 
 class InicioPacienteActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         val email = intent.getStringExtra("email") ?: ""
         enableEdgeToEdge()
@@ -151,14 +150,26 @@ fun InicioPacienteTela(email: String) {
             ) {
                 ActionButton(
                     text = "Agendar Consulta",
-                    color = Color(0xFF7D59E6),
+                    color = Color(0xFF65BDF0),
                     email = email
                 )
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // RECENTES
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                ActionButton(
+                    text = "Meus Agendamentos",
+                    color = pink,
+                    email = email
+                )
+            }
+
+            Spacer(modifier = Modifier.height(25.dp))
+
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -415,9 +426,15 @@ fun ActionButton(
 
     Button(
         onClick = {
-            val intent = Intent(context, AgendamentoActivity::class.java)
-            intent.putExtra("email", email);
-            context.startActivity(intent)
+            if("Agendar Consulta".equals(text)) {
+                val intent = Intent(context, AgendamentoActivity::class.java)
+                intent.putExtra("email", email);
+                context.startActivity(intent)
+            } else if("Meus Agendamentos".equals(text)) {
+                val intent = Intent(context, MeusAgendamentosActivity::class.java)
+                intent.putExtra("email", email);
+                context.startActivity(intent)
+            }
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = color

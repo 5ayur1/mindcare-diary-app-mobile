@@ -239,7 +239,7 @@ fun LoginTela(
                 )
             },
             modifier = Modifier
-                .fillMaxWidth()
+                .width(250.dp)
                 .height(52.dp),
 
             colors = ButtonDefaults.buttonColors(

@@ -191,7 +191,6 @@ fun MinhasReceitasTela(
     }
 }
 
-
 @Composable
 fun BottomPrescriptionBar(
     email: String

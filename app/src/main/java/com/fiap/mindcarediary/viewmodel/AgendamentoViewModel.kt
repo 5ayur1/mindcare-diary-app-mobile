@@ -19,6 +19,10 @@ class AgendamentoViewModel : ViewModel() {
 
     val horarios: StateFlow<List<RecomendacaoHorario>> = _horarios
 
+    private val _agendamentos = MutableStateFlow<List<Consulta>>(emptyList())
+
+    val agendamentos: StateFlow<List<Consulta>> = _agendamentos
+
     private val _tipoProfissional =
         MutableStateFlow<TipoProfissional?>(null)
 
@@ -74,4 +78,34 @@ class AgendamentoViewModel : ViewModel() {
         }
     }
 
+    fun loadAgendamentos(
+        nomeUsuario: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit) {
+
+        viewModelScope.launch {
+            try {
+                val response =
+                    repository.carregarConsultas(nomeUsuario)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        _agendamentos.value = body;
+                        onSuccess("Carregamento de lista de agendamentos realizado com sucesso.")
+                    } else {
+                        _agendamentos.value = emptyList();
+                        onError("Não foi possível carregar os agendamentos do paciente.")
+                    }
+                } else {
+                    _agendamentos.value = emptyList();
+                    onError(
+                        "Erro ao carregar lista de agendamentos: ${response.code()}"
+                    )
+                }
+            } catch (e: Exception) {
+                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                _agendamentos.value = emptyList()
+            }
+        }
+    }
 }

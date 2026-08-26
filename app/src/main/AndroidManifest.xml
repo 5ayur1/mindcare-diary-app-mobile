@@ -20,6 +20,9 @@
             android:name=".paciente.MinhasPrescricoesActivity"
             android:exported="false" />
         <activity
+            android:name=".paciente.MeusAgendamentosActivity"
+            android:exported="false" />
+        <activity
             android:name=".paciente.AgendamentoActivity"
             android:exported="false" />
         <activity

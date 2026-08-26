@@ -215,6 +215,7 @@ fun AgendamentoTela(
                 HeaderSection(
                     onBackClick = {
                         val intent = Intent(context, InicioPacienteActivity::class.java)
+                        intent.putExtra("email", email)
                         context.startActivity(intent)
                     },
                     loginViewModel = loginViewModel
@@ -340,6 +341,7 @@ fun AgendamentoTela(
 
                         agendamentoViewModel.cadastrarAgendamento(
                             Consulta(
+                                null,
                                 profissionalFinal,
                                 paciente,
                                 false,
