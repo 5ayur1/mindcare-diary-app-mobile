@@ -1,5 +1,8 @@
 package com.fiap.mindcarediary
 
+import android.R
+import android.content.Intent
+import android.graphics.Color.blue
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +15,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -21,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,19 +52,24 @@ fun CreditosTela() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        val context = LocalContext.current
+
         // Topo
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFE91E63))
-                .padding(16.dp),
+                .height(150.dp)
+                .background(Color(0xFFE63B96))
+                .padding(20.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Créditos",
                 color = Color.White,
                 fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(16.dp)
             )
         }
 
@@ -91,10 +104,11 @@ fun CreditosTela() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text("• Erica Okamura")
-                Text("• Gustavo Oliveira Silva")
-                Text("• Michelle Sayuri Ueta")
-                Text("• João Augusto Santiago Gomes")
+                Text("Erica Okamura")
+                Text("Gustavo Oliveira Silva")
+                Text("João Augusto Santiago Gomes")
+                Text("Matheus Eduardo da Silva")
+                Text("Michelle Sayuri Ueta")
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -120,6 +134,27 @@ fun CreditosTela() {
                     color = Color.LightGray
                 )
             }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                val intent = Intent(context, BemVindoActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier
+                .width(210.dp)
+                .height(52.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF0A0A4A)
+            )
+        ) {
+            Text(
+                text = "Voltar",
+                color = Color.White,
+                fontSize = 18.sp
+            )
         }
     }
 }

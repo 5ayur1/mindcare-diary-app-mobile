@@ -333,6 +333,7 @@ fun RelatorioSemanalCard(
     val quantidadePositivos = relatorio.totalPositivos
     val quantidadeNegativos = relatorio.totalNegativos
     val rangeDates = relatorio.faixaDeDatas.split("^")
+    val number = relatorio.number
     val initialDate = rangeDates[0]
     val finalDate = rangeDates[1]
     val context = LocalContext.current
@@ -353,9 +354,18 @@ fun RelatorioSemanalCard(
         ) {
 
             Text(
-                text = "${initialDate} :: ${finalDate}",
+                text = "${initialDate} | ${finalDate}",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = "#${number}",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFB57BE2)
             )
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -226,6 +226,7 @@ fun RelatorioCard(
     val rangeDates = relatorio.faixaDeDatas.split("^")
     val initialDate = rangeDates[0]
     val finalDate = rangeDates[1]
+    val number = relatorio.number
 
     Card(
         modifier = Modifier
@@ -242,7 +243,18 @@ fun RelatorioCard(
         ) {
 
             Text(
-                text = "$initialDate :: $finalDate",
+                text = "$initialDate | $finalDate",
+                color = Color(0xFFA020F0),
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Spacer(
+                modifier = Modifier.width(16.dp)
+            )
+
+            Text(
+                text = "#$number",
                 color = Color(0xFFA020F0),
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp

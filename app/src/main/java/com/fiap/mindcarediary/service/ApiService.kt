@@ -56,7 +56,8 @@ data class RelatorioSemanal (
     val dataHoraCriacao: String,
     val totalPositivos: Int,
     val totalNegativos: Int,
-    val resumo: String
+    val resumo: String,
+    val number: String
 )
 
 data class Consulta (

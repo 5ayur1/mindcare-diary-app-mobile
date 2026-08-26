@@ -50,9 +50,6 @@
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".TipoUsuarioActivity"
-            android:exported="false" />
-        <activity
             android:name=".CreditosActivity"
             android:exported="false" />
         <activity

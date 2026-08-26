@@ -74,7 +74,7 @@ fun BemVindoTela() {
 
         Button(
             onClick = {
-                val intent = Intent(context, TipoUsuarioActivity::class.java)
+                val intent = Intent(context, LoginActivity::class.java)
                 context.startActivity(intent)
             },
             modifier = Modifier
