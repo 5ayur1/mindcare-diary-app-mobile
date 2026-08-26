@@ -51,12 +51,13 @@ class PrescriptionViewModel : ViewModel() {
     fun enviarPrescricao(
         context: Context,
         nomeUsuario: String,
-        profissionalNomeUsuario: String,
         issueDate: String,
         expirationDate: String,
         medicines: List<String>,
         controlled: Boolean,
-        pdfUri: Uri
+        pdfUri: Uri,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
     ) {
 
         viewModelScope.launch {
@@ -80,9 +81,6 @@ class PrescriptionViewModel : ViewModel() {
                             nomeUsuario =
                                 nomeUsuario,
 
-                            profissionalNomeUsuario =
-                                profissionalNomeUsuario.toRequestBody(),
-
                             issueDate =
                                 issueDate.toRequestBody(),
 
@@ -104,7 +102,19 @@ class PrescriptionViewModel : ViewModel() {
 
                     _success.value = true
 
+                    val body = response.body()
+
+                    if (body != null) {
+                        onSuccess("Upload de PDF realizado com sucesso.")
+                    } else {
+                        onError("PDF não encontrado.")
+                    }
+
                 } else {
+
+                    onError(
+                        "Erro ao enviar receita: ${response.code()}"
+                    )
 
                     _error.value =
                         "Erro ao enviar receita: HTTP ${response.code()}"

@@ -10,10 +10,10 @@ import retrofit2.Response
 class PrescriptionRepository {
 
     suspend fun salvarPrescricao(
-        nomeUsuario: String, profissionalNomeUsuario: RequestBody, issueDate: RequestBody, expirationDate: RequestBody,
+        nomeUsuario: String, issueDate: RequestBody, expirationDate: RequestBody,
         medicines: RequestBody, controlled: RequestBody, arquivo: MultipartBody.Part
-    ): Response<Unit> {
-        return RetrofitClient.api.salvarPrescricao(nomeUsuario, profissionalNomeUsuario, issueDate,
+    ): Response<ResponseBody> {
+        return RetrofitClient.api.salvarPrescricao(nomeUsuario, issueDate,
             expirationDate, medicines, controlled, arquivo)
     }
 

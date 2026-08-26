@@ -59,6 +59,7 @@ import com.fiap.mindcarediary.service.Paciente
 import com.fiap.mindcarediary.viewmodel.PacienteViewModel
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.fiap.mindcarediary.viewmodel.PrescriptionViewModel
@@ -86,8 +87,7 @@ class NovaPrescricaoProfissionalActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
-            val prescriptionViewModel: PrescriptionViewModel =
-                viewModel()
+
 
             NovaPrescricaoProfissionalTela(
                 pacienteNomeUsuario = pacienteNomeUsuario,
@@ -100,16 +100,7 @@ class NovaPrescricaoProfissionalActivity : ComponentActivity() {
                         controlled,
                         pdfUri ->
 
-                    prescriptionViewModel.enviarPrescricao(
-                        context = this@NovaPrescricaoProfissionalActivity,
-                        nomeUsuario = pacienteNomeUsuario,
-                        profissionalNomeUsuario = email,
-                        issueDate = issueDate,
-                        expirationDate = expirationDate,
-                        medicines = medicines,
-                        controlled = controlled,
-                        pdfUri = pdfUri
-                    )
+
                 }
             )
         }
@@ -304,6 +295,8 @@ fun NovaPrescricaoProfissionalTela(
     ) -> Unit = { _, _, _, _, _ -> }
 ) {
 
+    val context = LocalContext.current
+
     val pacienteViewModel: PacienteViewModel = viewModel()
 
     val paciente by pacienteViewModel.paciente.collectAsState()
@@ -339,6 +332,9 @@ fun NovaPrescricaoProfissionalTela(
                 expirationDate.isNotBlank() &&
                 medicines.isNotEmpty() &&
                 selectedPdfUri != null
+
+    val prescriptionViewModel: PrescriptionViewModel =
+        viewModel()
 
     LaunchedEffect(pacienteNomeUsuario) {
         pacienteViewModel.loadDadosPaciente(
@@ -659,12 +655,28 @@ fun NovaPrescricaoProfissionalTela(
 
                             selectedPdfUri?.let { uri ->
 
-                                onSendPrescriptionClick(
-                                    issueDate,
-                                    expirationDate,
-                                    medicines,
-                                    controlled,
-                                    uri
+                                prescriptionViewModel.enviarPrescricao(
+                                    context = context,
+                                    nomeUsuario = pacienteNomeUsuario,
+                                    issueDate = issueDate,
+                                    expirationDate = expirationDate,
+                                    medicines = medicines,
+                                    controlled = controlled,
+                                    pdfUri = uri,
+                                    onSuccess = { mensagem ->
+                                        Toast.makeText(
+                                            context,
+                                            mensagem,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    },
+                                    onError = { mensagem ->
+                                        Toast.makeText(
+                                            context,
+                                            mensagem,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
                                 )
                             }
                         },

@@ -165,9 +165,9 @@ interface ApiService {
     suspend fun gerarRelatorioSemanal(@Path("nomeUsuario") nomeUsuario: String): RelatorioSemanal
 
     @Multipart
-    @POST("pacientes/{nomeUsuario}/prescriptions")
-    suspend fun salvarPrescricao(@Path("nomeUsuario") nomeUsuario: String, @Part("profissionalNomeUsuario") profissionalNomeUsuario: RequestBody, @Part("issueDate") issueDate: RequestBody, @Part("expirationDate") expirationDate: RequestBody,
-                                 @Part("medicines") medicines: RequestBody, @Part("controlled") controlled: RequestBody, @Part arquivo: MultipartBody.Part): Response<Unit>
+    @POST("prescriptions/{pacienteNomeUsuario}")
+    suspend fun salvarPrescricao(@Path("pacienteNomeUsuario") pacienteNomeUsuario: String, @Part("issueDate") issueDate: RequestBody, @Part("expirationDate") expirationDate: RequestBody,
+                                 @Part("medicines") medicines: RequestBody, @Part("controlled") controlled: RequestBody, @Part arquivo: MultipartBody.Part): Response<ResponseBody>
 
     @POST("prescriptions/{profissionalNomeUsuario}/{number}/pdf")
     suspend fun downloadPrescriptionPdf(
