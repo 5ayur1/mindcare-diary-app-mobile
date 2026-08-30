@@ -413,6 +413,8 @@ private fun AgendamentoCard(
     val cancelada =
         agendamento.cancelada
 
+    val atendida = agendamento.atendida
+
     val statusBackground =
         if (cancelada)
             StatusRed
@@ -426,10 +428,11 @@ private fun AgendamentoCard(
             StatusGreenText
 
     val statusLabel =
-        if (cancelada)
+        if (cancelada && !atendida)
             "Cancelada"
-        else
+        else if(!atendida && !cancelada)
             "Agendada"
+        else "Atendida"
 
     val dataConsulta = agendamento.dataHoraConsulta!!.split("T")[0]
     val horaConsulta = agendamento.dataHoraConsulta!!.split("T")[1]
