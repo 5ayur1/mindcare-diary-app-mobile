@@ -12,11 +12,17 @@ class AuthInterceptor(
         chain: Interceptor.Chain
     ): Response {
 
+        var request = chain.request()
+
+        if (request.url.encodedPath == "/login") {
+            return chain.proceed(request)
+        }
+
         val token = runBlocking {
             tokenManager.token.first()
         }
 
-        val request = chain.request()
+        request = chain.request()
             .newBuilder()
             .apply {
 
