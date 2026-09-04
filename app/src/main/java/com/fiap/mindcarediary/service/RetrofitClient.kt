@@ -14,7 +14,6 @@ object RetrofitClient {
     private lateinit var retrofit: Retrofit
 
     lateinit var api: ApiService
-        private set
 
     fun initialize(context: Context) {
 

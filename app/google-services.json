@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "315806226535",
+    "project_id": "mindcare-diary-batch-2a00c",
+    "storage_bucket": "mindcare-diary-batch-2a00c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315806226535:android:b0f676ac62a327458e9cc2",
+        "android_client_info": {
+          "package_name": "com.fiap.mindcarediary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMt85VH347I7ByTeUqn6q7KY8fD_g5GdY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

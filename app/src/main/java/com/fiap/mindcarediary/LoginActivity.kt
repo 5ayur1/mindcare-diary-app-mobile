@@ -51,6 +51,7 @@ import com.fiap.mindcarediary.repository.AuthRepository
 import com.fiap.mindcarediary.service.TokenManager
 import com.fiap.mindcarediary.viewmodel.LoginViewModel
 import com.fiap.mindcarediary.viewmodel.LoginViewModelFactory
+import kotlin.math.log
 
 class LoginActivity : ComponentActivity() {
 
@@ -185,6 +186,7 @@ fun LoginTela(
 
         Button(
             onClick = {
+                loginViewModel.generateFirebaseToken(nomeUsuario)
                 loginViewModel.efetuarLogin(
                     nomeUsuario = nomeUsuario,
                     senha = senha,

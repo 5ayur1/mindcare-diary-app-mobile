@@ -183,4 +183,7 @@ interface ApiService {
 
     @GET("agendamentos/{nomeUsuario}")
     suspend fun carregarConsultas(@Path("nomeUsuario") nomeUsuario: String): Response<List<Consulta>>
+
+    @POST("usuarios/token/{nomeUsuario}")
+    suspend fun salvarToken(@Path("nomeUsuario") nomeUsuario: String, @Query("token") token: String)
 }

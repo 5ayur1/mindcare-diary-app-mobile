@@ -56,4 +56,14 @@ class LoginViewModel(private val repository: AuthRepository) : ViewModel() {
             }
         }
     }
+
+    fun generateFirebaseToken(nomeUsuario: String) {
+        viewModelScope.launch {
+            try {
+                repository.getFirebaseToken(nomeUsuario)
+            } catch (e: Exception) {
+                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+            }
+        }
+    }
 }

@@ -1,9 +1,10 @@
 import org.gradle.kotlin.dsl.implementation
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -31,8 +32,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true
@@ -41,12 +42,12 @@ android {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
     // Or shorter:
-    jvmToolchain(17)
+    jvmToolchain(21)
     // For example:
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 dependencies {
@@ -81,4 +82,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation(platform("com.google.firebase:firebase-bom:34.18.0"))
+    implementation("com.google.firebase:firebase-messaging")
+
 }
