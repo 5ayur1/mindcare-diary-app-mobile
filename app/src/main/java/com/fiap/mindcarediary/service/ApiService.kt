@@ -43,7 +43,10 @@ data class RegistroDiario (
     val nivelHumor: String,
     val pontosPositivos: String,
     val dificuldadesDesafios: String,
-    val dataHoraCriacao: String
+    val dataHoraCriacao: String,
+    val id: Long? = null,
+    val textoConfirmado: String? = null,
+    val origem: String? = null
 )
 
 data class RelatorioSemanal (
@@ -128,11 +131,17 @@ data class LoginResponse(
 
 interface ApiService {
 
+    @POST("mia/mensagens")
+    suspend fun enviarMensagemMia(@Body request: MiaMessageRequest): MiaMessageResponse
+
+    @POST("mia/registros")
+    suspend fun salvarRegistroMia(@Body request: MiaRegistroRequest): RegistroDiario
+
     @GET("registrosDiarios/{nomeUsuario}")
     suspend fun retornarRegistrosDiarios(@Path("nomeUsuario") nomeUsuario: String): List<RegistroDiario>
 
     @POST("registrosDiarios/cadastrarRegistroDiario/{nomeUsuario}")
-    suspend fun cadastrarRegistroDiario(@Path("nomeUsuario") nomeUsuario: String, @Body request: RegistroDiario): RegistroDiario
+    suspend fun cadastrarRegistroDiario(@Path("nomeUsuario") nomeUsuario: String, @Body request: RegistroDiario)
 
     @POST("agendamentos")
     suspend fun salvarAgendamento(@Body consulta: Consulta)

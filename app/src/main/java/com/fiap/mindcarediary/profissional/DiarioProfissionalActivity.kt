@@ -407,6 +407,10 @@ private fun RegistroCard(
                 }
             }
 
+            if (!registro.textoConfirmado.isNullOrBlank()) {
+                Text("Registro pelo chat", fontWeight = FontWeight.Bold)
+                Text(registro.textoConfirmado, modifier = Modifier.padding(vertical = 12.dp))
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             Card(

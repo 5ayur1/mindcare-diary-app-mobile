@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.fiap.mindcarediary"
-    testNamespace = "com.fiap.mindcarediary"
+    testNamespace = "com.fiap.mindcarediary.test"
     compileSdk = 36
 
     defaultConfig {
@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.material)
     testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)

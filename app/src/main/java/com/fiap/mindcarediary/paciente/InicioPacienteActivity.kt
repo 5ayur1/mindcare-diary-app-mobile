@@ -44,6 +44,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,7 +78,9 @@ class InicioPacienteActivity: ComponentActivity() {
 
 data class DiaryItem(
     val emoji: String,
-    val date: String
+    val date: String,
+    val content: String = "",
+    val origin: String = "TRADITIONAL"
 )
 
 fun converteParaEmoji(nivelHumor: String): String {
@@ -108,7 +113,9 @@ fun InicioPacienteTela(email: String) {
     val items = registrosDiarios.map { registro ->
         DiaryItem(
             emoji = converteParaEmoji(registro.nivelHumor),
-            date = registro.dataHoraCriacao.split("T")[0]
+            date = registro.dataHoraCriacao.split("T")[0],
+            content = registro.textoConfirmado ?: listOf(registro.pontosPositivos, registro.dificuldadesDesafios).filter { it.isNotBlank() }.joinToString("\n\n"),
+            origin = registro.origem ?: "TRADITIONAL"
         )
     }
 
@@ -377,6 +384,8 @@ fun BottomMenuInicio(
 @Composable
 fun DiaryCard(item: DiaryItem) {
 
+    var expanded by remember(item) { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
@@ -407,10 +416,14 @@ fun DiaryCard(item: DiaryItem) {
                 )
 
                 Text(
-                    text = "Diário Completo",
+                    text = if (item.origin == "CHAT") "Chat com a MIA" else "Diário Tradicional",
                     color = Color(0xFF11114A),
                     fontSize = 15.sp
                 )
+                if (item.content.isNotBlank()) {
+                    TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "Ocultar registro" else "Ler registro") }
+                    if (expanded) Text(item.content, color = Color(0xFF11114A), modifier = Modifier.padding(top = 8.dp))
+                }
             }
         }
     }

@@ -44,6 +44,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,7 +90,10 @@ fun DiarioPacienteTela(
     val pink = Color(0xFFE78BC3)
     val blue = Color(0xFF1E88E5)
 
-    var selectedMood by remember { mutableStateOf("Bem") }
+    var selectedMood by remember { mutableStateOf("SEM_DEFINICAO") }
+    val saving by viewModel.salvandoDiario.collectAsState()
+    val saved by viewModel.diarioSalvo.collectAsState()
+    val saveError by viewModel.erroDiario.collectAsState()
     var positiveText by remember { mutableStateOf("") }
     var negativeText by remember { mutableStateOf("") }
 
@@ -128,6 +132,17 @@ fun DiarioPacienteTela(
                     .padding(16.dp)
                     .weight(1f)
             ) {
+
+                item {
+                    Text("Diário Tradicional", fontWeight = FontWeight.Bold)
+                    Button(onClick = {
+                        context.startActivity(Intent(context, ChatMiaActivity::class.java).putExtra("email", email))
+                    }, enabled = !saving, modifier = Modifier.fillMaxWidth()) {
+                        Text("Chat com a MIA")
+                    }
+                    Text("Escolha escrever abaixo ou conversar com a assistente de registro.")
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // HUMOR
                 item {
@@ -255,6 +270,7 @@ fun DiarioPacienteTela(
 
                     // BOTÃO
                     Button(
+                        enabled = !saving && !saved,
                         onClick = {
                             viewModel.cadastrarRegistroDiario(
                                 RegistroDiario(
@@ -272,8 +288,10 @@ fun DiarioPacienteTela(
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Salvar Diário")
+                        Text(if (saving) "Salvando…" else if (saved) "Diário salvo" else "Salvar Diário")
                     }
+                    saveError?.let { Text(it, color = Color.Red) }
+                    if (saved) Text("Seu diário foi salvo. Você pode consultá-lo no início.")
                 }
             }
         }

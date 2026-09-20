@@ -11,10 +11,18 @@ import com.fiap.mindcarediary.service.RelatorioSemanal
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CancellationException
 
 class PacienteViewModel : ViewModel() {
 
     private val repository = PacienteRepository()
+
+    private val _salvandoDiario = MutableStateFlow(false)
+    val salvandoDiario: StateFlow<Boolean> = _salvandoDiario
+    private val _diarioSalvo = MutableStateFlow(false)
+    val diarioSalvo: StateFlow<Boolean> = _diarioSalvo
+    private val _erroDiario = MutableStateFlow<String?>(null)
+    val erroDiario: StateFlow<String?> = _erroDiario
 
     private val _registrosDiarios = MutableStateFlow<List<RegistroDiario>>(emptyList())
     val registrosDiarios: StateFlow<List<RegistroDiario>> = _registrosDiarios
@@ -36,18 +44,25 @@ class PacienteViewModel : ViewModel() {
             try {
                 _registrosDiarios.value = repository.retornarRegistrosDiarios(nomeUsuario)
             } catch (e: Exception) {
-                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
                 _registrosDiarios.value = emptyList()
             }
         }
     }
 
     fun cadastrarRegistroDiario(registroDiario: RegistroDiario, nomeUsuario: String) {
+        if (_salvandoDiario.value || _diarioSalvo.value) return
+        _salvandoDiario.value = true
+        _erroDiario.value = null
         viewModelScope.launch {
             try {
                 repository.cadastrarRegistroDiario(registroDiario, nomeUsuario)
+                _diarioSalvo.value = true
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
-
+                _erroDiario.value = "Não foi possível confirmar o salvamento. Consulte o histórico antes de tentar novamente."
+            } finally {
+                _salvandoDiario.value = false
             }
         }
     }
@@ -56,10 +71,8 @@ class PacienteViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val retorno = repository.retornarDadosPaciente(nomeUsuario)
-                Log.i("PACIENTE", "Paciente retornado: $retorno")
                 _paciente.value = retorno
             } catch (e: Exception) {
-                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
                 _paciente.value = null
             }
         }
@@ -69,10 +82,8 @@ class PacienteViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val retorno = repository.retornarRelatoriosSemanais(nomeUsuario)
-                Log.i("RELATORIOS", "Relatórios retornados: $retorno")
                 _relatorios.value = retorno
             } catch (e: Exception) {
-                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
                 _relatorios.value = emptyList()
             }
         }
@@ -83,14 +94,12 @@ class PacienteViewModel : ViewModel() {
             try {
                 val retorno = repository.retornarPrescricoes(nomeUsuario)
                 if(retorno.isSuccessful) {
-                    Log.i("PRESCRIPTIONS", "Prescrições retornadas: $retorno")
                     val body = retorno.body()
                     if(body != null) {
                         _prescriptions.value = body
                     }
                 }
             } catch (e: Exception) {
-                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
                 _prescriptions.value = emptyList()
             }
         }
