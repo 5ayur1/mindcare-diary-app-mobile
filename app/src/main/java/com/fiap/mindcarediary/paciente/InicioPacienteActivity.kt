@@ -100,9 +100,12 @@ fun InicioPacienteTela(email: String) {
     var viewModel: PacienteViewModel = viewModel()
 
     val registrosDiarios by viewModel.registrosDiarios.collectAsState()
+    val paciente by viewModel.paciente.collectAsState()
+    val primeiroNome = paciente?.nomeCompleto?.trim()?.takeWhile { !it.isWhitespace() }.orEmpty()
 
     LaunchedEffect(email) {
         viewModel.loadRegistrosDiarios(email)
+        viewModel.loadDadosPaciente(email)
     }
 
     val background = Color(0xFFDDF1FA)
@@ -147,7 +150,7 @@ fun InicioPacienteTela(email: String) {
                 .background(background)
         ) {
 
-            TopMenuInicio(email, pink, dark, loginViewModel)
+            TopMenuInicio(primeiroNome, pink, dark, loginViewModel)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -217,7 +220,7 @@ fun InicioPacienteTela(email: String) {
 
 @Composable
 fun TopMenuInicio(
-    email: String,
+    primeiroNome: String,
     pink: Color,
     dark: Color,
     loginViewModel: LoginViewModel)
@@ -262,6 +265,9 @@ fun TopMenuInicio(
                     Text("👩", fontSize = 24.sp)
                 }
 
+                androidx.compose.material3.TextButton(onClick = {
+                    context.startActivity(Intent(context, com.fiap.mindcarediary.PerfilPrivacidadeActivity::class.java))
+                }) { Text("Meu perfil") }
                 IconButton(onClick = {
                     loginViewModel.logout()
                     val intent = Intent(context, BemVindoActivity::class.java)
@@ -288,7 +294,7 @@ fun TopMenuInicio(
                 )
 
                 Text(
-                    text = "Olá $email,\ncomo você está se sentindo hoje?",
+                    text = if (primeiroNome.isNotBlank()) "Olá $primeiroNome,\ncomo você está se sentindo hoje?" else "Olá,\ncomo você está se sentindo hoje?",
                     color = dark,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp

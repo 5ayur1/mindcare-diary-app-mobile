@@ -95,6 +95,73 @@ fun LoginTela(
     var showPassword by remember { mutableStateOf(false) }
 
 
+    var showTerms by remember { mutableStateOf(false) }
+    var googleLogin by remember { mutableStateOf(false) }
+    var loggingIn by remember { mutableStateOf(false) }
+    val loginAction: () -> Unit = {
+        loggingIn = true
+
+                loginViewModel.efetuarLogin(
+                    nomeUsuario = nomeUsuario,
+                    senha = senha,
+                    onSuccess = { loginResponse ->
+                        loggingIn = false
+                        loginViewModel.generateFirebaseToken(nomeUsuario)
+
+                        if (
+                            "PACIENTE".equals(
+                                loginResponse.userRole,
+                                ignoreCase = true
+                            )
+                        ) {
+
+                            val intent = Intent(
+                                context,
+                                InicioPacienteActivity::class.java
+                            )
+
+                            intent.putExtra(
+                                "email",
+                                nomeUsuario
+                            )
+
+                            context.startActivity(intent)
+
+                        } else if (
+                            "PROFISSIONAL".equals(
+                                loginResponse.userRole,
+                                ignoreCase = true
+                            )
+                        ) {
+
+                            val intent = Intent(
+                                context,
+                                InicioProfissionalActivity::class.java
+                            )
+
+                            intent.putExtra(
+                                "email",
+                                nomeUsuario
+                            )
+
+                            context.startActivity(intent)
+                        }
+                    },
+                    onError = { message ->
+                        loggingIn = false
+                        Toast.makeText(
+                            context,
+                            message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
+    }
+    if (showTerms) LoginTermsDialog(onAccept = {
+        showTerms = false
+        if (googleLogin) onGoogleClick() else loginAction()
+    }, onCancel = { showTerms = false })
+
     val background = Color(0xFFDCEFFA)
     val darkBlue = Color(0xFF10104D)
     val pink = Color(0xFFE63B96)
@@ -185,61 +252,8 @@ fun LoginTela(
         Spacer(modifier = Modifier.height(28.dp))
 
         Button(
-            onClick = {
-                loginViewModel.generateFirebaseToken(nomeUsuario)
-                loginViewModel.efetuarLogin(
-                    nomeUsuario = nomeUsuario,
-                    senha = senha,
-                    onSuccess = { loginResponse ->
-
-                        if (
-                            "PACIENTE".equals(
-                                loginResponse.userRole,
-                                ignoreCase = true
-                            )
-                        ) {
-
-                            val intent = Intent(
-                                context,
-                                InicioPacienteActivity::class.java
-                            )
-
-                            intent.putExtra(
-                                "email",
-                                nomeUsuario
-                            )
-
-                            context.startActivity(intent)
-
-                        } else if (
-                            "PROFISSIONAL".equals(
-                                loginResponse.userRole,
-                                ignoreCase = true
-                            )
-                        ) {
-
-                            val intent = Intent(
-                                context,
-                                InicioProfissionalActivity::class.java
-                            )
-
-                            intent.putExtra(
-                                "email",
-                                nomeUsuario
-                            )
-
-                            context.startActivity(intent)
-                        }
-                    },
-                    onError = { message ->
-                        Toast.makeText(
-                            context,
-                            message,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                )
-            },
+            onClick = { googleLogin = false; showTerms = true },
+            enabled = !loggingIn,
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
@@ -266,7 +280,7 @@ fun LoginTela(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = onGoogleClick,
+            onClick = { googleLogin = true; showTerms = true },
             modifier = Modifier
                 .width(210.dp)
                 .height(52.dp),

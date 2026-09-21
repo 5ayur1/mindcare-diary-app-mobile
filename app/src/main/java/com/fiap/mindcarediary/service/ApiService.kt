@@ -122,7 +122,7 @@ sealed class PdfState {
 data class LoginRequest (
     val nomeUsuario: String,
     val senha: String
-)
+, val versaoTermos: String = com.fiap.mindcarediary.LEGAL_VERSION)
 
 data class LoginResponse(
     val token: String,
@@ -130,6 +130,12 @@ data class LoginResponse(
 )
 
 interface ApiService {
+    @retrofit2.http.Streaming
+    @POST("minha-conta/exportacao")
+    suspend fun exportarConta(@Body request: ConfirmacaoConta): okhttp3.ResponseBody
+
+    @POST("minha-conta/encerramento")
+    suspend fun encerrarConta(@Body request: ConfirmacaoConta): EncerramentoResponse
 
     @POST("mia/mensagens")
     suspend fun enviarMensagemMia(@Body request: MiaMessageRequest): MiaMessageResponse
@@ -196,3 +202,6 @@ interface ApiService {
     @POST("usuarios/token/{nomeUsuario}")
     suspend fun salvarToken(@Path("nomeUsuario") nomeUsuario: String, @Query("token") token: String)
 }
+
+class ConfirmacaoConta(val senha: String)
+data class EncerramentoResponse(val protocolo: String, val status: String, val mensagem: String)

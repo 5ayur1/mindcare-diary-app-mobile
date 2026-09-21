@@ -18,6 +18,7 @@
         android:theme="@style/Theme.MindcareDiary"
         android:usesCleartextTraffic="true"
         android:name=".MindCareApplication">
+        <activity android:name=".PerfilPrivacidadeActivity" android:exported="false" />
         <activity android:name=".paciente.ChatMiaActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".paciente.PdfViewerActivity"

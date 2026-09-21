@@ -134,13 +134,13 @@ fun DiarioPacienteTela(
             ) {
 
                 item {
-                    Text("Diário Tradicional", fontWeight = FontWeight.Bold)
+                    Text("Escolha escrever abaixo ou conversar com a assistente de registro.")
                     Button(onClick = {
                         context.startActivity(Intent(context, ChatMiaActivity::class.java).putExtra("email", email))
                     }, enabled = !saving, modifier = Modifier.fillMaxWidth()) {
                         Text("Chat com a MIA")
                     }
-                    Text("Escolha escrever abaixo ou conversar com a assistente de registro.")
+                    Text("Diário Tradicional", fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
