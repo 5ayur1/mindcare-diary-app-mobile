@@ -44,6 +44,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,7 +78,9 @@ class InicioPacienteActivity: ComponentActivity() {
 
 data class DiaryItem(
     val emoji: String,
-    val date: String
+    val date: String,
+    val content: String = "",
+    val origin: String = "TRADITIONAL"
 )
 
 fun converteParaEmoji(nivelHumor: String): String {
@@ -95,9 +100,12 @@ fun InicioPacienteTela(email: String) {
     var viewModel: PacienteViewModel = viewModel()
 
     val registrosDiarios by viewModel.registrosDiarios.collectAsState()
+    val paciente by viewModel.paciente.collectAsState()
+    val primeiroNome = paciente?.nomeCompleto?.trim()?.takeWhile { !it.isWhitespace() }.orEmpty()
 
     LaunchedEffect(email) {
         viewModel.loadRegistrosDiarios(email)
+        viewModel.loadDadosPaciente(email)
     }
 
     val background = Color(0xFFDDF1FA)
@@ -108,7 +116,9 @@ fun InicioPacienteTela(email: String) {
     val items = registrosDiarios.map { registro ->
         DiaryItem(
             emoji = converteParaEmoji(registro.nivelHumor),
-            date = registro.dataHoraCriacao.split("T")[0]
+            date = registro.dataHoraCriacao.split("T")[0],
+            content = registro.textoConfirmado ?: listOf(registro.pontosPositivos, registro.dificuldadesDesafios).filter { it.isNotBlank() }.joinToString("\n\n"),
+            origin = registro.origem ?: "TRADITIONAL"
         )
     }
 
@@ -140,7 +150,7 @@ fun InicioPacienteTela(email: String) {
                 .background(background)
         ) {
 
-            TopMenuInicio(email, pink, dark, loginViewModel)
+            TopMenuInicio(primeiroNome, pink, dark, loginViewModel)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -210,7 +220,7 @@ fun InicioPacienteTela(email: String) {
 
 @Composable
 fun TopMenuInicio(
-    email: String,
+    primeiroNome: String,
     pink: Color,
     dark: Color,
     loginViewModel: LoginViewModel)
@@ -255,6 +265,9 @@ fun TopMenuInicio(
                     Text("👩", fontSize = 24.sp)
                 }
 
+                androidx.compose.material3.TextButton(onClick = {
+                    context.startActivity(Intent(context, com.fiap.mindcarediary.PerfilPrivacidadeActivity::class.java))
+                }) { Text("Meu perfil") }
                 IconButton(onClick = {
                     loginViewModel.logout()
                     val intent = Intent(context, BemVindoActivity::class.java)
@@ -281,7 +294,7 @@ fun TopMenuInicio(
                 )
 
                 Text(
-                    text = "Olá $email,\ncomo você está se sentindo hoje?",
+                    text = if (primeiroNome.isNotBlank()) "Olá $primeiroNome,\ncomo você está se sentindo hoje?" else "Olá,\ncomo você está se sentindo hoje?",
                     color = dark,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
@@ -377,6 +390,8 @@ fun BottomMenuInicio(
 @Composable
 fun DiaryCard(item: DiaryItem) {
 
+    var expanded by remember(item) { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
@@ -407,10 +422,14 @@ fun DiaryCard(item: DiaryItem) {
                 )
 
                 Text(
-                    text = "Diário Completo",
+                    text = if (item.origin == "CHAT") "Chat com a MIA" else "Diário Tradicional",
                     color = Color(0xFF11114A),
                     fontSize = 15.sp
                 )
+                if (item.content.isNotBlank()) {
+                    TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "Ocultar registro" else "Ler registro") }
+                    if (expanded) Text(item.content, color = Color(0xFF11114A), modifier = Modifier.padding(top = 8.dp))
+                }
             }
         }
     }

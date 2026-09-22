@@ -13,7 +13,7 @@ class PacienteRepository {
         return RetrofitClient.api.retornarRegistrosDiarios(nomeUsuario)
     }
 
-    suspend fun cadastrarRegistroDiario(registroDiario: RegistroDiario, nomeUsuario: String): RegistroDiario {
+    suspend fun cadastrarRegistroDiario(registroDiario: RegistroDiario, nomeUsuario: String) {
         return RetrofitClient.api.cadastrarRegistroDiario(nomeUsuario, registroDiario)
     }
 

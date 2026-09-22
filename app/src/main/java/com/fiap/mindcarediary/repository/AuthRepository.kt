@@ -20,10 +20,7 @@ class AuthRepository (
         try {
             val token = firebaseMessaging.token.await()
             RetrofitClient.api.salvarToken(nomeUsuario, token)
-            Log.d(
-                "FCM",
-                "TOKEN = $token"
-            )
+
         } catch (e: Exception) {
             println(
                 "Erro ao obter token FCM: ${e.message}"

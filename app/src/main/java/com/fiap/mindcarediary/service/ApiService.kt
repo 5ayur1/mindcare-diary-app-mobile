@@ -43,7 +43,10 @@ data class RegistroDiario (
     val nivelHumor: String,
     val pontosPositivos: String,
     val dificuldadesDesafios: String,
-    val dataHoraCriacao: String
+    val dataHoraCriacao: String,
+    val id: Long? = null,
+    val textoConfirmado: String? = null,
+    val origem: String? = null
 )
 
 data class RelatorioSemanal (
@@ -119,7 +122,7 @@ sealed class PdfState {
 data class LoginRequest (
     val nomeUsuario: String,
     val senha: String
-)
+, val versaoTermos: String = com.fiap.mindcarediary.LEGAL_VERSION)
 
 data class LoginResponse(
     val token: String,
@@ -127,12 +130,24 @@ data class LoginResponse(
 )
 
 interface ApiService {
+    @retrofit2.http.Streaming
+    @POST("minha-conta/exportacao")
+    suspend fun exportarConta(@Body request: ConfirmacaoConta): okhttp3.ResponseBody
+
+    @POST("minha-conta/encerramento")
+    suspend fun encerrarConta(@Body request: ConfirmacaoConta): EncerramentoResponse
+
+    @POST("mia/mensagens")
+    suspend fun enviarMensagemMia(@Body request: MiaMessageRequest): MiaMessageResponse
+
+    @POST("mia/registros")
+    suspend fun salvarRegistroMia(@Body request: MiaRegistroRequest): RegistroDiario
 
     @GET("registrosDiarios/{nomeUsuario}")
     suspend fun retornarRegistrosDiarios(@Path("nomeUsuario") nomeUsuario: String): List<RegistroDiario>
 
     @POST("registrosDiarios/cadastrarRegistroDiario/{nomeUsuario}")
-    suspend fun cadastrarRegistroDiario(@Path("nomeUsuario") nomeUsuario: String, @Body request: RegistroDiario): RegistroDiario
+    suspend fun cadastrarRegistroDiario(@Path("nomeUsuario") nomeUsuario: String, @Body request: RegistroDiario)
 
     @POST("agendamentos")
     suspend fun salvarAgendamento(@Body consulta: Consulta)
@@ -187,3 +202,6 @@ interface ApiService {
     @POST("usuarios/token/{nomeUsuario}")
     suspend fun salvarToken(@Path("nomeUsuario") nomeUsuario: String, @Query("token") token: String)
 }
+
+class ConfirmacaoConta(val senha: String)
+data class EncerramentoResponse(val protocolo: String, val status: String, val mensagem: String)

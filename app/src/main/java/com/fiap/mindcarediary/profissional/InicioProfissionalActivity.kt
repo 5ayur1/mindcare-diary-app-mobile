@@ -191,6 +191,9 @@ private fun HeaderSection(
 
                 Spacer(modifier = Modifier.weight(1f))
 
+                androidx.compose.material3.TextButton(onClick = {
+                    context.startActivity(Intent(context, com.fiap.mindcarediary.PerfilPrivacidadeActivity::class.java))
+                }) { Text("Meu perfil") }
                 IconButton(onClick = {
                     loginViewModel.logout()
                     val intent = Intent(context, BemVindoActivity::class.java)
