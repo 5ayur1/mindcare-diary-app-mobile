@@ -302,7 +302,7 @@ fun RelatorioCard(
 
             ObservacaoCard(
                 observacao = relatorio.observacoes,
-                recomendacao = relatorio.recomendacoes
+                recomendacao = relatorio.recomendacoes,
             )
         }
     }
@@ -348,8 +348,8 @@ fun IndicadorCard(
 
 @Composable
 fun ObservacaoCard(
-    observacao: String,
-    recomendacao: String
+    observacao: String?,
+    recomendacao: String?
 ) {
 
     Card(
@@ -377,19 +377,23 @@ fun ObservacaoCard(
                 modifier = Modifier.height(8.dp)
             )
 
-            Text(observacao)
+            if (!observacao.isNullOrBlank()) {
+                Text(observacao)
+            }
 
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
-
-            Card {
-
-                Text(
-                    text = "Recomendação:\n$recomendacao",
-                    modifier = Modifier.padding(16.dp),
-                    color = Color(0xFF5D39D9)
+            if (!recomendacao.isNullOrBlank()) {
+                Spacer(
+                    modifier = Modifier.height(12.dp)
                 )
+
+                Card {
+
+                    Text(
+                        text = "Recomendação:\n$recomendacao",
+                        modifier = Modifier.padding(16.dp),
+                        color = Color(0xFF5D39D9)
+                    )
+                }
             }
         }
     }
