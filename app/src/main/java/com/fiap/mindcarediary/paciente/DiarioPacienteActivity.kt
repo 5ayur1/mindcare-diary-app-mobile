@@ -43,6 +43,10 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -70,6 +74,7 @@ class DiarioPacienteActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
         setContent {
             DiarioPacienteTela(this)
@@ -83,22 +88,28 @@ fun DiarioPacienteTela(
 
 ) {
 
-    val viewModel: PacienteViewModel = viewModel()
+    val editor: com.fiap.mindcarediary.viewmodel.DiarioEditorViewModel = viewModel()
     val email = activity.intent?.getStringExtra("email") ?: "Unknown"
 
     val background = Color(0xFFDDF1FA)
     val pink = Color(0xFFE78BC3)
     val blue = Color(0xFF1E88E5)
 
-    var selectedMood by remember { mutableStateOf("SEM_DEFINICAO") }
-    val saving by viewModel.salvandoDiario.collectAsState()
-    val saved by viewModel.diarioSalvo.collectAsState()
-    val saveError by viewModel.erroDiario.collectAsState()
-    var positiveText by remember { mutableStateOf("") }
-    var negativeText by remember { mutableStateOf("") }
-
+    val editorState by editor.state.collectAsState()
+    val selectedMood = editorState.humor
+    val saving = editorState.salvando
+    val saved = editorState.salvo
+    val saveError = editorState.erro
+    val positiveText = editorState.positivo
+    val negativeText = editorState.negativo
     val context = LocalContext.current
-
+    var confirmDiscard by remember { mutableStateOf(false) }
+    LaunchedEffect(email) { editor.bind(email, com.fiap.mindcarediary.repository.ProtectedDraftStore(context, email, "diario")) }
+    if (!editorState.pronto) { CircularProgressIndicator(); return }
+    if (confirmDiscard) AlertDialog(onDismissRequest = { confirmDiscard = false },
+        title = { Text("Descartar rascunho?") }, text = { Text("O texto local será removido. Se tentou salvar, consulte o histórico.") },
+        confirmButton = { TextButton(onClick = { editor.descartar(); confirmDiscard = false }) { Text("Descartar") } },
+        dismissButton = { TextButton(onClick = { confirmDiscard = false }) { Text("Cancelar") } })
     val tokenManager = remember {
         TokenManager(context.applicationContext)
     }
@@ -141,6 +152,9 @@ fun DiarioPacienteTela(
                         Text("Chat com a MIA")
                     }
                     Text("Diário Tradicional", fontWeight = FontWeight.Bold)
+                    Text("Rascunho protegido neste aparelho; removido ao sair da conta.")
+                    editorState.aviso?.let { Text(it) }
+                    TextButton(onClick = { confirmDiscard = true }, enabled = !saving && !saved) { Text("Descartar rascunho") }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
@@ -164,11 +178,11 @@ fun DiarioPacienteTela(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                MoodItem("😄", "OTIMO", selectedMood) { selectedMood = it }
-                                MoodItem("🙂", "BOM", selectedMood) { selectedMood = it }
-                                MoodItem("😐", "NEUTRO", selectedMood) { selectedMood = it }
-                                MoodItem("☹️", "MAL", selectedMood) { selectedMood = it }
-                                MoodItem("😭", "PESSIMO", selectedMood) { selectedMood = it }
+                                MoodItem("😄", "OTIMO", selectedMood) { editor.editar(humor = it) }
+                                MoodItem("🙂", "BOM", selectedMood) { editor.editar(humor = it) }
+                                MoodItem("😐", "NEUTRO", selectedMood) { editor.editar(humor = it) }
+                                MoodItem("☹️", "MAL", selectedMood) { editor.editar(humor = it) }
+                                MoodItem("😭", "PESSIMO", selectedMood) { editor.editar(humor = it) }
                             }
                         }
                     }
@@ -207,7 +221,8 @@ fun DiarioPacienteTela(
 
                             OutlinedTextField(
                                 value = positiveText,
-                                onValueChange = { positiveText = it },
+                                onValueChange = { editor.editar(positivo = it) },
+                                enabled = !saving && !saved,
                                 placeholder = {
                                     Text("O que aconteceu de bom hoje? Quais momentos te deixaram feliz?")
                                 },
@@ -252,7 +267,8 @@ fun DiarioPacienteTela(
 
                             OutlinedTextField(
                                 value = negativeText,
-                                onValueChange = { negativeText = it },
+                                onValueChange = { editor.editar(negativo = it) },
+                                enabled = !saving && !saved,
                                 placeholder = {
                                     Text("O que te incomodou hoje? Houve algum momento difícil?")
                                 },
@@ -272,14 +288,7 @@ fun DiarioPacienteTela(
                     Button(
                         enabled = !saving && !saved,
                         onClick = {
-                            viewModel.cadastrarRegistroDiario(
-                                RegistroDiario(
-                                    selectedMood,
-                                    positiveText,
-                                    negativeText,
-                                    ""
-                                ), email
-                            )
+                            editor.salvar()
                         },
                         modifier = Modifier
                             .fillMaxWidth()

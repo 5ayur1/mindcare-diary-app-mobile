@@ -130,6 +130,9 @@ data class LoginResponse(
 )
 
 interface ApiService {
+    @GET("meu-diario/historico")
+    suspend fun historico(@Query("texto") texto: String?, @Query("inicio") inicio: String?, @Query("fim") fim: String?,
+        @Query("humor") humor: String?, @Query("origem") origem: String?, @Query("pagina") pagina: Int): com.fiap.mindcarediary.model.HistoricoPagina
     @retrofit2.http.Streaming
     @POST("minha-conta/exportacao")
     suspend fun exportarConta(@Body request: ConfirmacaoConta): okhttp3.ResponseBody

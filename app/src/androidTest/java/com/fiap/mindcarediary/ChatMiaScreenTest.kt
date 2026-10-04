@@ -7,6 +7,9 @@ import com.fiap.mindcarediary.paciente.ChatMiaScreen
 import com.fiap.mindcarediary.repository.ChatRepository
 import com.fiap.mindcarediary.service.*
 import com.fiap.mindcarediary.viewmodel.ChatViewModel
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
 import org.junit.Rule
 import org.junit.Test
 
@@ -22,6 +25,9 @@ class ChatMiaScreenTest {
         val model = ChatViewModel(repository)
         compose.setContent { MaterialTheme { ChatMiaScreen({}, {}, model) } }
         compose.onNodeWithText("MindCare Intelligent Assistent").assertIsDisplayed()
+        File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "qa-chat.png").outputStream().use {
+            compose.onRoot().captureToImage().asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+        }
         compose.onNodeWithContentDescription("Mensagem").performTextInput("Meu relato")
         compose.onNodeWithContentDescription("Enviar").performClick()
         compose.waitUntil { model.state.value.messages.size == 3 }

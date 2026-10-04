@@ -11,6 +11,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import com.fiap.mindcarediary.repository.DraftStore
+import com.google.gson.Gson
 import java.util.UUID
 
 data class ChatMessage(val id: String = UUID.randomUUID().toString(), val text: String, val patient: Boolean) {
@@ -29,6 +35,8 @@ data class ChatUiState(
     val mood: String = "SEM_DEFINICAO",
     val saving: Boolean = false,
     val saveAttempted: Boolean = false,
+    val draftReady: Boolean = true,
+    val draftNotice: String? = null,
     val saved: Boolean = false
 ) {
     val hasDraft get() = input.isNotBlank() || messages.any { it.patient }
@@ -44,6 +52,43 @@ class ChatViewModel(
     val state = mutableState.asStateFlow()
     private var saveRequest: MiaRegistroRequest? = null
 
+    private data class Draft(val texts: List<String>, val input: String, val review: String, val mood: String, val request: MiaRegistroRequest?)
+    private var draftStore: DraftStore? = null
+    private var draftWriter: Job? = null
+    private fun draftJson(): String? {
+        val s = state.value
+        return if (s.saved || !s.hasDraft) null else Gson().toJson(Draft(s.messages.filter { it.patient }.map { it.text }, s.input, s.confirmedText, s.mood, saveRequest))
+    }
+    fun bindDraft(store: DraftStore) {
+        if (draftStore != null) return
+        draftStore = store
+        mutableState.update { it.copy(draftReady = false) }
+        scope.launch {
+            try {
+                store.load()?.let {
+                    val draft = Gson().fromJson(it, Draft::class.java)
+                    saveRequest = draft.request
+                    mutableState.value = ChatUiState(messages = ChatUiState().messages + draft.texts.map { text -> ChatMessage(text = text, patient = true) },
+                        input = draft.input, confirmedText = draft.review, mood = draft.mood, reviewing = draft.request != null,
+                        saveAttempted = draft.request != null, draftNotice = "Rascunho recuperado. Revise antes de salvar.", draftReady = false)
+                }
+            } catch (e: CancellationException) { throw e }
+            catch (_: Exception) { mutableState.update { it.copy(draftNotice = "Não foi possível recuperar o rascunho local.") } }
+            mutableState.update { it.copy(draftReady = true) }
+            draftWriter = scope.launch {
+                state.map { draftJson() }.distinctUntilChanged().collect { value ->
+                    try { store.save(value) } catch (e: CancellationException) { throw e }
+                    catch (_: Exception) { mutableState.update { it.copy(draftNotice = "Não foi possível proteger a cópia local. Mantenha a tela aberta até salvar.") } }
+                }
+            }
+        }
+    }
+    fun discardDraft() {
+        if (!state.value.sending && !state.value.saving && !state.value.recognizingSpeech && state.value.draftReady) {
+            saveRequest = null
+            mutableState.value = ChatUiState()
+        }
+    }
     fun updateInput(text: String) {
         if (!state.value.recognizingSpeech && !state.value.sending && !state.value.reviewing && !state.value.saved && state.value.pendingReply == null && text.length <= 4000) {
             mutableState.update { it.copy(input = text, error = null) }
@@ -150,9 +195,12 @@ class ChatViewModel(
         mutableState.update { it.copy(saving = true, saveAttempted = true, error = null) }
         scope.launch {
             try {
+                draftStore?.save(draftJson())
                 repository.save(request)
+                draftWriter?.cancelAndJoin()
                 saveRequest = null
                 mutableState.value = ChatUiState(messages = emptyList(), saved = true)
+                try { draftStore?.save(null) } catch (_: Exception) { mutableState.update { it.copy(draftNotice = "Registro salvo, mas a cópia local não pôde ser removida.") } }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {

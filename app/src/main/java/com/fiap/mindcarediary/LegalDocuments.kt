@@ -9,12 +9,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
-const val LEGAL_VERSION = "2026-09-21.1"
+const val LEGAL_VERSION = "2026-10-04.1"
 
 @Composable
 fun LegalDocumentDialog(file: String, onClose: () -> Unit) {
     val context = LocalContext.current
-    val text = remember(file) { context.assets.open("legal/$file").bufferedReader().use { it.readText() } }
+    val text by produceState("Carregando documento…", file) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try { context.assets.open("legal/$file").bufferedReader().use { it.readText() } }
+            catch (_: java.io.IOException) { "Não foi possível abrir o documento. Feche e tente novamente." }
+        }
+    }
     AlertDialog(onDismissRequest = onClose,
         title = { Text(if (file == "termos.txt") "Termos de Uso" else "Política de Privacidade") },
         text = { Text(text, Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
