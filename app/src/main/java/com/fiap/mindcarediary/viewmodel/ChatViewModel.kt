@@ -1,5 +1,6 @@
 package com.fiap.mindcarediary.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiap.mindcarediary.repository.ApiChatRepository
@@ -155,7 +156,8 @@ class ChatViewModel(
                 mutableState.value = ChatUiState(messages = emptyList(), saved = true)
             } catch (cancelled: CancellationException) {
                 throw cancelled
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.i(" API_CALL", "Requisição realizada com erro: " + e.message);
                 mutableState.update { it.copy(saving = false, error = "Não foi possível confirmar o salvamento. Tente novamente com este mesmo registro ou consulte seu histórico antes de criar outro.") }
             }
         }

@@ -4,7 +4,7 @@ import com.fiap.mindcarediary.service.*
 
 interface ChatRepository {
     suspend fun send(message: String): MiaMessageResponse
-    suspend fun save(request: MiaRegistroRequest): RegistroDiario
+    suspend fun save(request: MiaRegistroRequest)
 }
 
 class ApiChatRepository(private val api: ApiService = RetrofitClient.api) : ChatRepository {

@@ -141,7 +141,7 @@ interface ApiService {
     suspend fun enviarMensagemMia(@Body request: MiaMessageRequest): MiaMessageResponse
 
     @POST("mia/registros")
-    suspend fun salvarRegistroMia(@Body request: MiaRegistroRequest): RegistroDiario
+    suspend fun salvarRegistroMia(@Body request: MiaRegistroRequest)
 
     @GET("registrosDiarios/{nomeUsuario}")
     suspend fun retornarRegistrosDiarios(@Path("nomeUsuario") nomeUsuario: String): List<RegistroDiario>
