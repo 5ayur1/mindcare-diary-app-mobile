@@ -193,7 +193,7 @@ fun MeusAgendamentosTela(
                     items(
                         items = agendamentosExibidos,
                         key = {
-                            it.number!!
+                            it.numero!!
                         }
                     ) { agendamento ->
 

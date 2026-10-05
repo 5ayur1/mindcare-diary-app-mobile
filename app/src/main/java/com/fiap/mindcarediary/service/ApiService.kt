@@ -60,11 +60,11 @@ data class RelatorioSemanal (
     val totalPositivos: Int,
     val totalNegativos: Int,
     val resumo: String,
-    val number: String
+    val numero: String
 )
 
 data class Consulta (
-    val number: String?,
+    val numero: String?,
     val profissional: Profissional?,
     val paciente: Paciente?,
     val atendida: Boolean,
@@ -78,7 +78,7 @@ data class RecomendacaoHorario (
 )
 
 data class Prescription(
-    val number: String,
+    val numero: String,
     val issueDate: String,
     val expirationDate: String,
     val daysRemaining: Int,
@@ -186,9 +186,9 @@ interface ApiService {
     suspend fun salvarPrescricao(@Path("pacienteNomeUsuario") pacienteNomeUsuario: String, @Part("issueDate") issueDate: RequestBody, @Part("expirationDate") expirationDate: RequestBody,
                                  @Part("medicines") medicines: RequestBody, @Part("controlled") controlled: RequestBody, @Part arquivo: MultipartBody.Part): Response<ResponseBody>
 
-    @POST("prescriptions/{profissionalNomeUsuario}/{number}/pdf")
+    @POST("prescriptions/{profissionalNomeUsuario}/{numero}/pdf")
     suspend fun downloadPrescriptionPdf(
-        @Path("profissionalNomeUsuario") profissionalNomeUsuario: String, @Path("number") number: String): Response<ResponseBody>
+        @Path("profissionalNomeUsuario") profissionalNomeUsuario: String, @Path("numero") numero: String): Response<ResponseBody>
 
     @GET("pacientes/{nomeUsuario}/prescriptions")
     suspend fun retornarPrescricoes(@Path("nomeUsuario") nomeUsuario: String): Response<List<Prescription>>

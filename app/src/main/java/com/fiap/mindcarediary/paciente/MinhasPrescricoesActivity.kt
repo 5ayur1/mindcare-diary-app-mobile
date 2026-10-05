@@ -156,7 +156,7 @@ fun MinhasReceitasTela(
                                 onSuccess = { pdfBytes ->
                                     val file = File(
                                         context.cacheDir,
-                                        "receita_${receita.number}.pdf"
+                                        "receita_${receita.numero}.pdf"
                                     )
 
                                     file.writeBytes(pdfBytes)
@@ -518,7 +518,7 @@ private fun PrescriptionCard(
             ) {
 
                 Text(
-                    text = "Receita #${receita.number ?: "N/A"}",
+                    text = "Receita #${receita.numero ?: "N/A"}",
                     color = MindCarePurple,
                     fontSize = 23.sp,
                     fontWeight = FontWeight.Bold

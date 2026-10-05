@@ -333,7 +333,7 @@ fun RelatorioSemanalCard(
     val quantidadePositivos = relatorio.totalPositivos
     val quantidadeNegativos = relatorio.totalNegativos
     val rangeDates = relatorio.faixaDeDatas.split("^")
-    val number = relatorio.number
+    val number = relatorio.numero
     val initialDate = rangeDates[0]
     val finalDate = rangeDates[1]
     val context = LocalContext.current

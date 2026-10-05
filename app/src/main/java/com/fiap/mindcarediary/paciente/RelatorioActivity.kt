@@ -226,7 +226,7 @@ fun RelatorioCard(
     val rangeDates = relatorio.faixaDeDatas.split("^")
     val initialDate = rangeDates[0]
     val finalDate = rangeDates[1]
-    val number = relatorio.number
+    val number = relatorio.numero
 
     Card(
         modifier = Modifier
