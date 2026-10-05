@@ -144,13 +144,13 @@ class PrescriptionViewModel : ViewModel() {
                 Log.i(
                     "DOWNLOAD_PDF",
                     "profissional=${receita.profissional.nomeUsuario}, " +
-                            "number=${receita.number}"
+                            "number=${receita.numero}"
                 )
 
                 val response = repository.downloadPrescricaoPdf(
                     profissionalNomeUsuario =
                         receita.profissional.nomeUsuario,
-                    number = receita.number
+                    number = receita.numero
                 )
 
                 if (response.isSuccessful) {

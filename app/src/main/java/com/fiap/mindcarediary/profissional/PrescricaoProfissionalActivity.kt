@@ -475,7 +475,7 @@ private fun PrescriptionTitle(
         ) {
 
             Text(
-                text = "Receita #${prescription.number}",
+                text = "Receita #${prescription.numero}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF7135DC)
