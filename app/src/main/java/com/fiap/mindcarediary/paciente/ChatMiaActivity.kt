@@ -45,7 +45,9 @@ class ChatMiaActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MindcareDiaryTheme(darkTheme = false, dynamicColor = false) {
-                ChatMiaScreen(onClose = { finish() }, onHistory = {
+                val model: ChatViewModel = viewModel()
+                LaunchedEffect(Unit) { model.bindDraft(com.fiap.mindcarediary.repository.ProtectedDraftStore(applicationContext, intent.getStringExtra("email").orEmpty(), "chat")) }
+                ChatMiaScreen(model = model, onClose = { finish() }, onHistory = {
                     startActivity(Intent(this, InicioPacienteActivity::class.java).apply {
                         putExtra("email", intent.getStringExtra("email"))
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -71,6 +73,8 @@ fun ChatMiaScreen(onClose: () -> Unit, onHistory: () -> Unit, model: ChatViewMod
 @Composable
 private fun ChatMiaContent(onClose: () -> Unit, onHistory: () -> Unit, model: ChatViewModel) {
     val state by model.state.collectAsStateWithLifecycle()
+    if (!state.draftReady) { CircularProgressIndicator(); return }
+    var confirmDiscard by remember { mutableStateOf(false) }
     var confirmExit by remember { mutableStateOf(false) }
     var speechHint by remember { mutableStateOf<String?>(null) }
     val close = { if (state.hasDraft && !state.saved) confirmExit = true else onClose() }
@@ -84,14 +88,15 @@ private fun ChatMiaContent(onClose: () -> Unit, onHistory: () -> Unit, model: Ch
         Column(Modifier.fillMaxSize().padding(padding).imePadding()) {
             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)).background(Color(0xFFE78BC3)).padding(vertical = 12.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = close) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar", tint = Color(0xFF11114A)) }
-                Image(painter = painterResource(R.drawable.mia_profile), contentDescription = "Foto de perfil da MIA",
-                    contentScale = ContentScale.Crop, modifier = Modifier.size(52.dp).clip(CircleShape))
+                MiaAvatar()
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text("MIA", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = Color(0xFF11114A))
                     Text("MindCare Intelligent Assistent", style = MaterialTheme.typography.bodySmall, color = Color(0xFF11114A))
                 }
             }
+            state.draftNotice?.let { Text(it, Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall) }
+            if (state.hasDraft && !state.saved) TextButton(onClick = { confirmDiscard = true }, enabled = !state.saving && !state.sending && !state.recognizingSpeech) { Text("Descartar rascunho") }
             when {
                 state.saved -> Column(Modifier.fillMaxWidth().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Registro salvo no seu diário.", style = MaterialTheme.typography.titleLarge)
@@ -128,7 +133,7 @@ private fun ChatMiaContent(onClose: () -> Unit, onHistory: () -> Unit, model: Ch
                     TextButton(onClick = model::cancelReview, enabled = !state.saveAttempted) { Text("Voltar à conversa") }
                 }
                 else -> {
-                    Text("A MIA ajuda a registrar seu dia; não oferece orientação clínica. O rascunho só será salvo após sua confirmação.",
+                    Text("A MIA ajuda a registrar seu dia; não oferece orientação clínica. O registro só será enviado ao diário após sua confirmação. Há uma cópia de rascunho protegida neste aparelho.",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp), style = MaterialTheme.typography.bodySmall, color = Color(0xFF555555))
                     LazyColumn(state = scroll, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items(state.messages, key = { it.id }) { message ->
@@ -176,9 +181,10 @@ private fun ChatMiaContent(onClose: () -> Unit, onHistory: () -> Unit, model: Ch
             }
         }
     }
+    if (confirmDiscard) AlertDialog(onDismissRequest = { confirmDiscard = false }, title = { Text("Descartar rascunho?") }, text = { Text("O texto local será removido. Se tentou salvar, consulte seu histórico antes de criar outro registro.") }, confirmButton = { TextButton(onClick = { model.discardDraft(); confirmDiscard = false }) { Text("Descartar") } }, dismissButton = { TextButton(onClick = { confirmDiscard = false }) { Text("Cancelar") } })
     if (confirmExit) AlertDialog(onDismissRequest = { confirmExit = false },
         title = { Text("Sair do chat?") },
-        text = { Text(if (state.saveAttempted) "O resultado do salvamento pode estar pendente. Consulte seu histórico antes de criar outro registro." else "O rascunho fica apenas nesta sessão. Ao sair, o texto não salvo será descartado.") },
+        text = { Text(if (state.saveAttempted) "O resultado do salvamento pode estar pendente. Consulte seu histórico antes de criar outro registro." else "O texto será mantido como rascunho protegido neste aparelho. Ele será removido ao sair da conta.") },
         confirmButton = { TextButton(onClick = onClose) { Text("Sair") } },
         dismissButton = { TextButton(onClick = { confirmExit = false }) { Text("Continuar") } })
 }

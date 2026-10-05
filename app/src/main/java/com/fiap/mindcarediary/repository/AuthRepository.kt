@@ -23,7 +23,7 @@ class AuthRepository (
 
         } catch (e: Exception) {
             println(
-                "Erro ao obter token FCM: ${e.message}"
+                "Falha ao atualizar notificações."
             )
         }
     }

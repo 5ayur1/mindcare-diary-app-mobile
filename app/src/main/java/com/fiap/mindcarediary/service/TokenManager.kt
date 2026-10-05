@@ -32,8 +32,11 @@ class TokenManager(
     }
 
     suspend fun clearToken() {
-        context.dataStore.edit { preferences ->
-            preferences.remove(JWT_TOKEN)
+        kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+            try { com.fiap.mindcarediary.repository.ProtectedDraftStore.clearAll(context) }
+            finally {
+                context.dataStore.edit { preferences -> preferences.remove(JWT_TOKEN) }
+            }
         }
     }
 }

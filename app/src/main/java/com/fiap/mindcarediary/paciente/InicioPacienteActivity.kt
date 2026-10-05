@@ -99,12 +99,14 @@ fun InicioPacienteTela(email: String) {
 
     var viewModel: PacienteViewModel = viewModel()
 
-    val registrosDiarios by viewModel.registrosDiarios.collectAsState()
+    val historico: com.fiap.mindcarediary.viewmodel.HistoricoViewModel = viewModel()
+    val historicoState by historico.state.collectAsState()
+    val registrosDiarios = historicoState.registros
     val paciente by viewModel.paciente.collectAsState()
     val primeiroNome = paciente?.nomeCompleto?.trim()?.takeWhile { !it.isWhitespace() }.orEmpty()
 
     LaunchedEffect(email) {
-        viewModel.loadRegistrosDiarios(email)
+        historico.buscar()
         viewModel.loadDadosPaciente(email)
     }
 
@@ -115,9 +117,9 @@ fun InicioPacienteTela(email: String) {
 
     val items = registrosDiarios.map { registro ->
         DiaryItem(
-            emoji = converteParaEmoji(registro.nivelHumor),
+            emoji = converteParaEmoji(registro.nivelHumor ?: "SEM_DEFINICAO"),
             date = registro.dataHoraCriacao.split("T")[0],
-            content = registro.textoConfirmado ?: listOf(registro.pontosPositivos, registro.dificuldadesDesafios).filter { it.isNotBlank() }.joinToString("\n\n"),
+            content = registro.textoConfirmado ?: listOfNotNull(registro.pontosPositivos, registro.dificuldadesDesafios).filter { it.isNotBlank() }.joinToString("\n\n"),
             origin = registro.origem ?: "TRADITIONAL"
         )
     }
@@ -202,6 +204,14 @@ fun InicioPacienteTela(email: String) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            TextButton(onClick = { context.startActivity(Intent(context, HistoricoActivity::class.java)) }) { Text("Pesquisar histórico") }
+            if (historicoState.carregando) androidx.compose.material3.LinearProgressIndicator(Modifier.fillMaxWidth())
+            historicoState.erro?.let {
+                Text(it, Modifier.padding(horizontal = 16.dp), color = Color.Red)
+                TextButton(onClick = historico::tentarNovamente) { Text("Tentar novamente") }
+            }
+            if (!historicoState.carregando && historicoState.erro == null && items.isEmpty())
+                Text("Você ainda não tem registros. Comece pelo Diário ou Chat.", Modifier.padding(16.dp))
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),

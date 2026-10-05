@@ -40,9 +40,9 @@ class LoginViewModel(private val repository: AuthRepository) : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                Log.i("API_CALL", "Falha de comunicação.")
                 _dadosResponse.value = null
-                onError(e.message ?: "Erro ao realizar login.")
+                onError("Não foi possível entrar. Confira sua conexão e tente novamente.")
             }
         }
     }
@@ -62,7 +62,7 @@ class LoginViewModel(private val repository: AuthRepository) : ViewModel() {
             try {
                 repository.getFirebaseToken(nomeUsuario)
             } catch (e: Exception) {
-                Log.i("API_CALL", "Requisição realizada com erro: " + e.message)
+                Log.i("API_CALL", "Falha de comunicação.")
             }
         }
     }
