@@ -18,7 +18,7 @@ class ChatMiaScreenTest {
 
     private val repository = object : ChatRepository {
         override suspend fun send(message: String) = MiaMessageResponse("MIA", "Assistente de registro", "Gostaria de contar mais?", false)
-        override suspend fun save(request: MiaRegistroRequest) = RegistroDiario(request.nivelHumor, "", "", "2026-09-17T12:00:00", 1L, request.textoConfirmado, "CHAT")
+        override suspend fun save(request: MiaRegistroRequest) = Unit
     }
 
     @Test fun showsChatAndRequiresReviewBeforeSaving() {

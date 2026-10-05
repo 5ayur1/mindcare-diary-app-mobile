@@ -107,10 +107,9 @@ class ChatViewModelTest {
             if (failSend) error("erro sensível do servidor")
             return MiaMessageResponse("MIA", "Assistente de registro", "Gostaria de contar mais?", fallback)
         }
-        override suspend fun save(request: MiaRegistroRequest): RegistroDiario {
+        override suspend fun save(request: MiaRegistroRequest) {
             saves += request
             if (failSave) error("erro de rede")
-            return RegistroDiario(request.nivelHumor, "", "", "2026-09-17T12:00:00", 1L, request.textoConfirmado, "CHAT")
         }
     }
 

@@ -60,7 +60,7 @@ class EvolucaoViewModelTest {
         val requests = mutableListOf<MiaRegistroRequest>()
         val repository = object : ChatRepository {
             override suspend fun send(message: String) = MiaMessageResponse("MIA", "Assistente", "RESPOSTA_NAO_PERSISTIR", false)
-            override suspend fun save(request: MiaRegistroRequest): RegistroDiario { requests.add(request); throw java.io.IOException() }
+            override suspend fun save(request: MiaRegistroRequest) { requests.add(request); throw java.io.IOException() }
         }
         val draft = MemoryDraft()
         val model = ChatViewModel(repository, backgroundScope)
